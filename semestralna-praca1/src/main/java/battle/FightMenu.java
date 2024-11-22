@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import javax.swing.Timer;
 
@@ -18,6 +20,8 @@ import semestralka.KeyHandler;
 public class FightMenu extends Battle {
     GamePanel gp;
     KeyHandler keyH;
+    Projectile projectile;
+    PlayerHeart playerHeart;
     private BufferedImage heart;
     private BufferedImage actionButtons;
     private BufferedImage flowey;
@@ -31,20 +35,30 @@ public class FightMenu extends Battle {
     private Random random;
     private int numberOfSprite;
     private String battleMessage;
+    private List<Projectile> tempProjectiles;
 
-    public FightMenu(GamePanel gp, KeyHandler keyH) {
+    private int i;
+
+    public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         this.gp = gp;
         this.keyH = keyH;
+        this.playerHeart = playerHeart;
 
         random = new Random();
         heartLocationX = gp.screenWidth / 13;
         hpOfEnemy = 100;
         numberOfSprite = 0;
-        xOfBattleRect = gp.tileSize;
+        xOfBattleRect = gp.screenWidth / 10;
+        yOfBattleRect = gp.screenHeight / 2;
         battleMessage = "Flowey wants to fight!";
         widthOfBattleRect = gp.screenWidth - 80;
+        projectiles = new ArrayList<>();
+        tempProjectiles = new ArrayList<>();
+        playerHealth = 100;
 
-        battleRectHitbox = new Rectangle(xOfBattleRect, gp.tileSize * 5, widthOfBattleRect, 170);
+        i = 0;
+
+        battleRectHitbox = new Rectangle(xOfBattleRect, yOfBattleRect, widthOfBattleRect, 170);
 
         getFightMenuImages();
         splitImagesActions();
@@ -99,6 +113,17 @@ public class FightMenu extends Battle {
         return new Rectangle(xOfBattleRect, gp.tileSize * 5, widthOfBattleRect, 170);
     }
 
+    public void enemyAttack() {
+        gp.changeTurn("+");
+        numberOfTurn++;
+        int numberOfProjectiles = random.nextInt(10) + 1;
+        while (numberOfProjectiles > i) {
+            makeProjectile();
+            numberOfProjectiles--;
+        }
+        tempProjectiles = new ArrayList<>(projectiles);
+    }
+
     public void update() {
         // Action choices movement
         if (numberOfTurn == 0) {
@@ -111,7 +136,6 @@ public class FightMenu extends Battle {
                 heartLocationX -= spaceBetweenButtons;
                 positionOfHeart--;
                 keyH.leftPressed = false;
-
             } else if (keyH.enterPressed && positionOfHeart == 0 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 // Attack logic
                 numberOfSprite = 3;
@@ -125,15 +149,43 @@ public class FightMenu extends Battle {
                 });
                 timer.setRepeats(false);
                 timer.start();
-                gp.changeTurn("+");
-                numberOfTurn++;
-            } else if (keyH.enterPressed && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 1) {
-                gp.changeTurn("-");
-                numberOfTurn--;
+                enemyAttack();
+            } else if (keyH.enterPressed && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 0) {
+                System.out.println("You chose to act on the enemy");
+            } else if (keyH.enterPressed && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0) {
+                if (playerHealth < 100) {
+                    playerHealth += random.nextInt(21) + 10;
+                }
+                keyH.enterPressed = false;
+                enemyAttack();
+            } else if (keyH.enterPressed && positionOfHeart == 3 && hpOfEnemy > 0 && numberOfTurn == 0) {
+                double chanceOfSpare = random.nextDouble() - hpOfEnemy / 1000 * 5;
+                if (chanceOfSpare > 0.7) {
+                    System.out.println("You spared the enemy with an " + chanceOfSpare + " chance");
+                    gp.changeFightMenu();
+                } else {
+                    enemyAttack();
+                }
+                keyH.enterPressed = false;
             }
-            if (hpOfEnemy <= 0) {
-                gp.changeFightMenu();
+        }
+
+        if (hpOfEnemy <= 0 || playerHealth <= 0) {
+            gp.changeFightMenu();
+        }
+
+        if (projectiles.size() > 0) {
+            for (Projectile projectile : tempProjectiles) {
+                projectile.update();
+                if (!projectile.bulletActive) {
+                    projectiles.remove(projectile);
+                }
             }
+        }
+
+        if (projectiles.size() == 0 && numberOfTurn == 1) {
+            gp.changeTurn("-");
+            numberOfTurn--;
         }
     }
 
@@ -143,16 +195,25 @@ public class FightMenu extends Battle {
             xOfBattleRect = (gp.screenWidth - widthOfBattleRect) / 2;
             battleMessage = "";
         } else {
+            playerHeart.worldXHeart = (gp.screenWidth - 16) / 2;
+            playerHeart.worldYHeart = (gp.screenHeight + 170 / 2) / 2;
+            playerHeart.heartHitBox = new Rectangle(playerHeart.worldXHeart, playerHeart.worldYHeart, 16, 16);
             widthOfBattleRect = gp.screenWidth - 80;
             xOfBattleRect = gp.tileSize;
             battleMessage = "Flowey wants to fight!";
         }
-        battleRectHitbox.setBounds(xOfBattleRect, gp.tileSize * 5, widthOfBattleRect, 170);
+        battleRectHitbox.setBounds(xOfBattleRect, yOfBattleRect, widthOfBattleRect, 170);
+    }
+
+    public void makeProjectile() {
+        projectile = new Projectile(gp, playerHeart);
+        projectile.setFightMenu(this);
+        projectiles.add(projectile);
     }
 
     public void drawFightMenu(Graphics2D g2) {
         int xOfButton = gp.screenWidth / 16;
-        int yOfButton = gp.tileSize * 10;
+        int yOfButton = gp.screenHeight - gp.screenHeight / 7;
         if (fightMenu) {
             g2.setColor(Color.WHITE);
             g2.setStroke(new BasicStroke(3));
@@ -161,10 +222,12 @@ public class FightMenu extends Battle {
             g2.setFont(new Font("TimesRoman", Font.PLAIN, 20));
             g2.drawString(battleMessage, gp.screenWidth / 10, gp.screenHeight / 2);
 
+            // Enemy
             g2.drawImage(floweyImages[numberOfSprite], (gp.screenWidth - (floweyImages[0].getWidth() * 2 + 20)) / 2,
                     gp.tileSize,
                     floweyImages[0].getWidth() * 2 + 20,
                     floweyImages[0].getHeight() * 2 + 20, null);
+            // Enemy health bar
             g2.setColor(Color.RED);
             g2.fillRect((gp.screenWidth - (floweyImages[0].getWidth() * 2 + 20)) / 2, gp.tileSize * 4, 100,
                     15);
@@ -232,7 +295,22 @@ public class FightMenu extends Battle {
                 default:
                     break;
             }
-            g2.drawImage(heart, heartLocationX, gp.screenHeight - gp.screenHeight / 7, 16, 16, null);
+            // Heart
+            g2.drawImage(heart, heartLocationX, yOfButton + 13, 16, 16, null);
+
+            // Heart health bar
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
+            g2.drawString("HP: " + playerHealth, gp.screenWidth / 2 - 7 * 19,
+                    gp.screenHeight - gp.screenHeight / 5 + 15);
+            g2.setColor(Color.RED);
+            g2.fillRect(gp.screenWidth / 2 - 50, gp.screenHeight - gp.screenHeight / 5, 100, 15);
+            g2.setColor(Color.GREEN);
+            g2.fillRect(gp.screenWidth / 2 - 50, gp.screenHeight - gp.screenHeight / 5, playerHealth, 15);
+
+            for (Projectile projectile : tempProjectiles) {
+                projectile.draw(g2);
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ import tile.Tile;
 import tile.TileManager;
 import battle.Battle;
 import battle.PlayerHeart;
+import battle.Projectile;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -53,7 +54,7 @@ public class GamePanel extends JPanel implements Runnable {
         tileManager = new TileManager(this);
         player.setTileManager(tileManager);
         playerHeart = new PlayerHeart(this, keyH);
-        fightMenu = new FightMenu(this, keyH);
+        fightMenu = new FightMenu(this, keyH, playerHeart);
         playerHeart.setFightMenu(fightMenu);
     }
 

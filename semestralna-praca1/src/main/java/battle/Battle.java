@@ -2,20 +2,24 @@ package battle;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Battle {
-
-    public BufferedImage heart;
+    public BufferedImage heart, bullet;
     public boolean fightMenu = true;
 
     // Players heart attributes
     public int worldXHeart, worldYHeart;
     public int heartSpeed;
-    public String directionHeart;
+    public static int playerHealth;
+
+    public int heartTopY, heartBottomY, heartLeftX, heartRightX;
     public boolean collisionDetected;
     public int numberOfTurn = 0;
 
     public int widthOfBattleRect;
-    public int xOfBattleRect;
+    public int xOfBattleRect, yOfBattleRect;
     public Rectangle battleRectHitbox;
+
+    public ArrayList<Projectile> projectiles;
 }

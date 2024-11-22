@@ -1,8 +1,10 @@
 package battle;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -13,14 +15,16 @@ public class PlayerHeart extends Battle {
     GamePanel gp;
     KeyHandler keyH;
     FightMenu fightMenu;
-    private Rectangle heartHitBox;
+    public Rectangle heartHitBox;
 
     public PlayerHeart(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
 
         heartSpeed = 3;
-        directionHeart = "";
+        playerHealth = 100;
+
+        projectiles = new ArrayList<>();
 
         worldXHeart = (gp.screenWidth - 16) / 2; // Calculating the middle of rectangle, 16 is the width of heart
         worldYHeart = (gp.screenHeight + 170 / 2) / 2; // 170 is the height of rectangle
@@ -46,20 +50,20 @@ public class PlayerHeart extends Battle {
         battleRectHitbox = fightMenu.setBattleRectHitbox();
 
         // Top edge of the heart
-        int heartTopY = heartHitBox.y;
+        heartTopY = heartHitBox.y;
         int rectTopY = battleRectHitbox.y;
 
         // Left side
         int rectLeftX = battleRectHitbox.x;
-        int heartLeftX = heartHitBox.x;
+        heartLeftX = heartHitBox.x;
 
         // Right side
         int rectRightX = battleRectHitbox.x + battleRectHitbox.width;
-        int heartRightX = heartHitBox.x + heartHitBox.width;
+        heartRightX = heartHitBox.x + heartHitBox.width;
 
         // Bottom side
         int rectBottomY = battleRectHitbox.y + battleRectHitbox.height;
-        int heartBottomY = heartHitBox.y + heartHitBox.height;
+        heartBottomY = heartHitBox.y + heartHitBox.height;
 
         // Check each side of the battle rectangle
         if (heartTopY <= rectTopY) {
@@ -78,7 +82,6 @@ public class PlayerHeart extends Battle {
             worldXHeart = rectRightX - heartSpeed - heartHitBox.width;
             heartHitBox.x = worldXHeart;
         }
-
     }
 
     public void update() {
@@ -128,10 +131,12 @@ public class PlayerHeart extends Battle {
             heartHitBox.x -= heartSpeed;
         }
         checkCollision();
-
     }
 
     public void draw(Graphics2D g2) {
+        g2.setColor(Color.RED); // For heartHitBox
+        g2.drawRect(heartHitBox.x, heartHitBox.y, heartHitBox.width,
+                heartHitBox.height);
 
         g2.drawImage(heart, worldXHeart, worldYHeart, 16, 16, null);
     }
