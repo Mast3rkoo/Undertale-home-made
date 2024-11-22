@@ -17,7 +17,7 @@ public class Battle {
     public boolean collisionDetected;
     public int numberOfTurn = 0;
 
-    public int widthOfBattleRect;
+    public int widthOfBattleRect, heightOfBattleRect;
     public int xOfBattleRect, yOfBattleRect;
     public Rectangle battleRectHitbox;
 

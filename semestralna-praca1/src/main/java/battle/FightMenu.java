@@ -37,8 +37,6 @@ public class FightMenu extends Battle {
     private String battleMessage;
     private List<Projectile> tempProjectiles;
 
-    private int i;
-
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         this.gp = gp;
         this.keyH = keyH;
@@ -52,11 +50,11 @@ public class FightMenu extends Battle {
         yOfBattleRect = gp.screenHeight / 2;
         battleMessage = "Flowey wants to fight!";
         widthOfBattleRect = gp.screenWidth - 80;
+        heightOfBattleRect = 170;
+
         projectiles = new ArrayList<>();
         tempProjectiles = new ArrayList<>();
         playerHealth = 100;
-
-        i = 0;
 
         battleRectHitbox = new Rectangle(xOfBattleRect, yOfBattleRect, widthOfBattleRect, 170);
 
@@ -117,8 +115,8 @@ public class FightMenu extends Battle {
         gp.changeTurn("+");
         numberOfTurn++;
         int numberOfProjectiles = random.nextInt(10) + 1;
-        while (numberOfProjectiles > i) {
-            makeProjectile();
+        while (numberOfProjectiles > 0) {
+            makeProjectile(2, random.nextInt(10) + 10, "right");
             numberOfProjectiles--;
         }
         tempProjectiles = new ArrayList<>(projectiles);
@@ -136,7 +134,8 @@ public class FightMenu extends Battle {
                 heartLocationX -= spaceBetweenButtons;
                 positionOfHeart--;
                 keyH.leftPressed = false;
-            } else if (keyH.enterPressed && positionOfHeart == 0 && hpOfEnemy > 0 && numberOfTurn == 0) {
+            }
+            if (keyH.enterPressed && positionOfHeart == 0 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 // Attack logic
                 numberOfSprite = 3;
                 hpOfEnemy -= random.nextInt(21) + 10;
@@ -205,10 +204,11 @@ public class FightMenu extends Battle {
         battleRectHitbox.setBounds(xOfBattleRect, yOfBattleRect, widthOfBattleRect, 170);
     }
 
-    public void makeProjectile() {
+    public void makeProjectile(int speed, int damage, String whichSide) {
         projectile = new Projectile(gp, playerHeart);
-        projectile.setFightMenu(this);
+        projectile.setFightMenu(this, whichSide);
         projectiles.add(projectile);
+        projectile.bulletLogic(speed, damage);
     }
 
     public void drawFightMenu(Graphics2D g2) {
