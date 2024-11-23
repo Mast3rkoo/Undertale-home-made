@@ -47,7 +47,7 @@ public class FightMenu extends Battle {
         hpOfEnemy = 100;
         numberOfSprite = 0;
         xOfBattleRect = gp.screenWidth / 10;
-        yOfBattleRect = gp.screenHeight / 2;
+        yOfBattleRect = gp.tileSize * 5;
         battleMessage = "Flowey wants to fight!";
         widthOfBattleRect = gp.screenWidth - 80;
         heightOfBattleRect = 170;
@@ -114,9 +114,27 @@ public class FightMenu extends Battle {
     public void enemyAttack() {
         gp.changeTurn("+");
         numberOfTurn++;
-        int numberOfProjectiles = random.nextInt(10) + 1;
+        int numberOfProjectiles = random.nextInt(10) + 30;
+        int randomSide = random.nextInt(3);
+        String side = "";
+        switch (randomSide) {
+            case 0:
+                side = "top";
+                break;
+            case 1:
+                side = "bottom";
+                break;
+            case 2:
+                side = "left";
+                break;
+            case 3:
+                side = "right";
+                break;
+            default:
+                break;
+        }
         while (numberOfProjectiles > 0) {
-            makeProjectile(2, random.nextInt(10) + 10, "right");
+            makeProjectile(2, random.nextInt(10) + 10, side);
             numberOfProjectiles--;
         }
         tempProjectiles = new ArrayList<>(projectiles);
@@ -124,6 +142,10 @@ public class FightMenu extends Battle {
 
     public void update() {
         // Action choices movement
+        if (hpOfEnemy <= 0 || playerHealth <= 0) {
+            gp.changeFightMenu();
+        }
+
         if (numberOfTurn == 0) {
             int spaceBetweenButtons = gp.screenWidth / 16 + subImageWidthActions;
             if (keyH.rightPressed && positionOfHeart <= 2 && positionOfHeart >= 0) {
@@ -167,10 +189,6 @@ public class FightMenu extends Battle {
                 }
                 keyH.enterPressed = false;
             }
-        }
-
-        if (hpOfEnemy <= 0 || playerHealth <= 0) {
-            gp.changeFightMenu();
         }
 
         if (projectiles.size() > 0) {

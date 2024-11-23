@@ -47,41 +47,41 @@ public class Projectile extends Battle {
         this.fightMenu = fightMenu;
         this.whichSide = whichSide;
 
-        xOfBattleRect = (gp.screenWidth - widthOfBattleRect) / 2;
-        yOfBattleRect = gp.screenHeight / 2;
-        widthOfBattleRect = (gp.screenWidth - 80) / 2;
-        heightOfBattleRect = 170;
+        int tempWidthOfBattleRect = (gp.screenWidth - 80) / 2;
+        int tempxOfBattleRect = (gp.screenWidth - tempWidthOfBattleRect) / 2;
+        int tempyOfBattleRect = gp.tileSize * 5;
+        int tempHeightOfBattleRect = 170;
 
         // Choosing random starting position of bullet based on width of rectangle
         if (whichSide.equals("top")) {
-            xOfBullet = (int) (Math.random()
-                    * ((xOfBattleRect + widthOfBattleRect - bullet.getWidth()) - (xOfBattleRect
-                            + bullet.getWidth())))
-                    + xOfBattleRect;
-            yOfBullet = yOfBattleRect + bullet.getHeight();
+            int minX = tempxOfBattleRect + bullet.getWidth();
+            int maxX = tempxOfBattleRect + tempWidthOfBattleRect - bullet.getWidth();
+            xOfBullet = (int) (Math.random() * (maxX - minX)) + minX;
+            yOfBullet = tempyOfBattleRect + bullet.getHeight();
         }
 
         else if (whichSide.equals("bottom")) {
-            xOfBullet = (int) (Math.random()
-                    * ((xOfBattleRect + widthOfBattleRect - bullet.getWidth()) - (xOfBattleRect
-                            + bullet.getWidth())))
-                    + xOfBattleRect;
-            yOfBullet = yOfBattleRect + heightOfBattleRect - bullet.getHeight();
+            int minX = tempxOfBattleRect + bullet.getWidth();
+            int maxX = tempxOfBattleRect + tempWidthOfBattleRect - bullet.getWidth();
+            xOfBullet = (int) (Math.random() * (maxX - minX)) + minX;
+            yOfBullet = tempyOfBattleRect + tempHeightOfBattleRect - bullet.getHeight();
         }
 
         else if (whichSide.equals("left")) {
-            xOfBullet = xOfBattleRect + bullet.getWidth();
-            yOfBullet = (int) (Math.random()
-                    * (yOfBattleRect + heightOfBattleRect - bullet.getHeight() - yOfBattleRect)
-                    + yOfBattleRect);
+            int minY = tempyOfBattleRect + bullet.getHeight();
+            int maxY = tempyOfBattleRect + tempHeightOfBattleRect - bullet.getHeight();
+            xOfBullet = tempxOfBattleRect + bullet.getWidth();
+            yOfBullet = (int) (Math.random() * (maxY - minY)) + minY;
         }
 
         else if (whichSide.equals("right")) {
-            xOfBullet = xOfBattleRect + widthOfBattleRect - bullet.getWidth();
-            yOfBullet = (int) (Math.random()
-                    * (yOfBattleRect + heightOfBattleRect - bullet.getHeight() - yOfBattleRect)
-                    + yOfBattleRect);
-        } else {
+            int minY = tempyOfBattleRect + bullet.getHeight();
+            int maxY = tempyOfBattleRect + tempHeightOfBattleRect + bullet.getHeight();
+            xOfBullet = tempxOfBattleRect + tempWidthOfBattleRect - bullet.getWidth() * 2;
+            yOfBullet = (int) (Math.random() * (maxY - minY)) + minY;
+        }
+
+        else {
             System.out.println("Error in setting bullet position");
         }
 
@@ -121,11 +121,10 @@ public class Projectile extends Battle {
             }
         }
 
-        // if (bulletBottomY >= rectBottomY || bulletLeftX <= rectLeftX || bulletRightX
-        // >= rectRightX
-        // || bulletTopY <= rectTopY) {
-        // bulletActive = false;
-        // }
+        if (bulletBottomY >= rectBottomY || bulletLeftX <= rectLeftX || bulletRightX >= rectRightX
+                || bulletTopY <= rectTopY) {
+            bulletActive = false;
+        }
     }
 
     public void bulletLogic(int speed, int damage) {

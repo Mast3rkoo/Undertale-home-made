@@ -18,7 +18,7 @@ import java.awt.Graphics2D;
 public class GamePanel extends JPanel implements Runnable {
 
     // Screen dimensions
-    final int originalTileSize = 20;
+    private final int originalTileSize = 20;
     public final int scale = 2;
 
     public final int tileSize = originalTileSize * scale;

@@ -4,7 +4,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 public class Entity {
-
     // Player attributes
     public int worldX, worldY;
     public int spawnX, spawnY;

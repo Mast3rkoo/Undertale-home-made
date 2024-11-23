@@ -13,8 +13,8 @@ import tile.TileManager;
 import battle.Battle;
 
 public class Player extends Entity {
-    GamePanel gp;
-    KeyHandler keyH;
+    private GamePanel gp;
+    private KeyHandler keyH;
     private TileManager tileManager;
     private Battle battle;
 
