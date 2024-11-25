@@ -32,7 +32,7 @@ public class Player extends Entity {
         screenX = gp.screenWidth / 2;
         screenY = gp.screenHeight / 2;
 
-        hitBox = new Rectangle(8, 16, 32, 32);
+        hitBox = new Rectangle(10, 20, 20, 20);
 
         setDefaultValues(gp.tileSize * 3, gp.tileSize * 3);
         getPlayerImage();
@@ -168,6 +168,9 @@ public class Player extends Entity {
                     break;
             }
             g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            g2.setColor(java.awt.Color.RED);
+            g2.drawRect(screenX + hitBox.x, screenY + hitBox.y, 20, 20);
+
         }
 
     }

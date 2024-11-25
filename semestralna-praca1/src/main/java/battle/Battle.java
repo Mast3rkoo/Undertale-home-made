@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Battle {
     public BufferedImage heart, bullet;
-    public boolean fightMenu = true;
+    public boolean fightMenu = false;
 
     // Players heart attributes
     public int worldXHeart, worldYHeart;
