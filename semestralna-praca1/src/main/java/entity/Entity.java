@@ -1,21 +1,71 @@
 package entity;
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 
 public class Entity {
     // Player attributes
-    public int worldX, worldY;
-    public int spawnX, spawnY;
-    public int speed;
+    private int worldX, worldY;
+    private int speed;
 
-    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2, heart;
-    public String direction;
+    private String direction;
 
-    public int spriteCounter = 0;
-    public int imageNumber = 1;
+    private Rectangle hitBox;
+    private boolean collisionDetected = false;
+    private boolean canWalkThroughDoor = false;
 
-    public Rectangle hitBox;
-    public boolean collisionDetected = false;
-    public boolean canWalkThroughDoor = false;
+    public int getWorldX() {
+        return worldX;
+    }
+
+    public void setWorldX(int worldX) {
+        this.worldX = worldX;
+    }
+
+    public int getWorldY() {
+        return worldY;
+    }
+
+    public void setWorldY(int worldY) {
+        this.worldY = worldY;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public Rectangle getHitBox() {
+        return hitBox;
+    }
+
+    public void setHitBox(Rectangle hitBox) {
+        this.hitBox = hitBox;
+    }
+
+    public boolean isCollisionDetected() {
+        return collisionDetected;
+    }
+
+    public void setCollisionDetected(boolean collisionDetected) {
+        this.collisionDetected = collisionDetected;
+    }
+
+    public boolean isWalkThroughDoor() {
+        return canWalkThroughDoor;
+    }
+
+    public void setWalkThroughDoor(boolean canWalkThroughDoor) {
+        this.canWalkThroughDoor = canWalkThroughDoor;
+    }
 }

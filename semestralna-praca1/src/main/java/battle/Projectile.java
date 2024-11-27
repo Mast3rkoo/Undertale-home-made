@@ -3,6 +3,7 @@ package battle;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
 
@@ -11,13 +12,14 @@ import javax.imageio.ImageIO;
 import semestralka.GamePanel;
 
 public class Projectile extends Battle {
-    GamePanel gp;
-    FightMenu fightMenu;
-    PlayerHeart playerHeart;
+    private GamePanel gp;
+    private FightMenu fightMenu;
+    private PlayerHeart playerHeart;
+    private BufferedImage bullet;
     private int xOfBullet, yOfBullet;
     private long lastSavedTime;
-    public Rectangle bulletHitBox;
-    public boolean bulletActive;
+    private Rectangle bulletHitBox;
+    private boolean bulletActive;
     private boolean alreadyHit = false;
     private int bulletSpeed;
     private int bulletDamage;
@@ -25,6 +27,7 @@ public class Projectile extends Battle {
     private String whichSide;
 
     public Projectile(GamePanel gp, PlayerHeart playerHeart) {
+        super(gp);
         this.gp = gp;
         this.playerHeart = playerHeart;
 
@@ -47,9 +50,9 @@ public class Projectile extends Battle {
         this.fightMenu = fightMenu;
         this.whichSide = whichSide;
 
-        int tempWidthOfBattleRect = (gp.screenWidth - 80) / 2;
-        int tempxOfBattleRect = (gp.screenWidth - tempWidthOfBattleRect) / 2;
-        int tempyOfBattleRect = gp.tileSize * 5;
+        int tempWidthOfBattleRect = (gp.getScreenWidth() - 80) / 2;
+        int tempxOfBattleRect = (gp.getScreenWidth() - tempWidthOfBattleRect) / 2;
+        int tempyOfBattleRect = gp.getTileSize() * 5;
         int tempHeightOfBattleRect = 170;
 
         // Choosing random starting position of bullet based on width of rectangle
@@ -89,7 +92,7 @@ public class Projectile extends Battle {
     }
 
     public void checkBulletCollision() {
-        battleRectHitbox = fightMenu.setBattleRectHitbox();
+        Rectangle battleRectHitbox = fightMenu.getBattleRectHitbox();
 
         // Bottom side
         int rectBottomY = battleRectHitbox.y + battleRectHitbox.height;
@@ -102,21 +105,25 @@ public class Projectile extends Battle {
         // Left side
         int bulletLeftX = bulletHitBox.x;
         int rectLeftX = battleRectHitbox.x;
+        System.out.println("Left " + rectLeftX);
 
         // Right side
         int bulletRightX = bulletHitBox.x + bulletHitBox.width;
         int rectRightX = battleRectHitbox.x + battleRectHitbox.width;
+        System.out.println("Right " + rectRightX);
 
         // Check if the bullet overlaps with the heart on the X-axis
-        boolean isXOverlap = (bulletRightX > playerHeart.heartLeftX && bulletLeftX < playerHeart.heartRightX);
+        boolean isXOverlap = (bulletRightX > playerHeart.getWorldHeart("leftX")
+                && bulletLeftX < playerHeart.getWorldHeart("rightX"));
 
         // Check if the bullet overlaps with the heart on the Y-axis
-        boolean isYOverlap = (bulletBottomY > playerHeart.heartTopY && bulletTopY < playerHeart.heartBottomY);
+        boolean isYOverlap = (bulletBottomY > playerHeart.getWorldHeart("topY")
+                && bulletTopY < playerHeart.getWorldHeart("bottomY"));
 
         if (isXOverlap && isYOverlap) {
             bulletActive = false;
             if (!alreadyHit) {
-                playerHealth -= bulletDamage;
+                fightMenu.changeHealth(bulletDamage);
                 alreadyHit = true;
             }
         }
@@ -130,6 +137,10 @@ public class Projectile extends Battle {
     public void bulletLogic(int speed, int damage) {
         bulletSpeed = speed;
         bulletDamage = damage;
+    }
+
+    public boolean getBulletActive() {
+        return bulletActive;
     }
 
     public void update() {
@@ -167,6 +178,7 @@ public class Projectile extends Battle {
             g2.setColor(Color.BLUE); // For missile hitbox
             g2.drawRect(bulletHitBox.x, bulletHitBox.y, bulletHitBox.width,
                     bulletHitBox.height);
+
             g2.drawImage(bullet, xOfBullet + bullet.getWidth(), yOfBullet, null);
         }
     }

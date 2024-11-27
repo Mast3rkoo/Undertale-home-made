@@ -3,8 +3,8 @@ package battle;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -12,24 +12,22 @@ import semestralka.GamePanel;
 import semestralka.KeyHandler;
 
 public class PlayerHeart extends Battle {
-    GamePanel gp;
-    KeyHandler keyH;
-    FightMenu fightMenu;
-    public Rectangle heartHitBox;
+    private KeyHandler keyH;
+    private FightMenu fightMenu;
+    private Rectangle heartHitBox;
+    private BufferedImage heart;
+    private int heartSpeed;
 
     public PlayerHeart(GamePanel gp, KeyHandler keyH) {
-        this.gp = gp;
+        super(gp);
         this.keyH = keyH;
 
         heartSpeed = 3;
-        playerHealth = 100;
 
-        projectiles = new ArrayList<>();
+        setWorldXHeart((gp.getScreenWidth() - 16) / 2); // Calculating the middle of rectangle, 16 is the width of heart
+        setWorldYHeart((gp.getScreenHeight() + 170 / 2) / 2); // 170 is the height of rectangle
 
-        worldXHeart = (gp.screenWidth - 16) / 2; // Calculating the middle of rectangle, 16 is the width of heart
-        worldYHeart = (gp.screenHeight + 170 / 2) / 2; // 170 is the height of rectangle
-
-        heartHitBox = new Rectangle(worldXHeart, worldYHeart, 16, 16);
+        heartHitBox = new Rectangle(getWorldXHeart(), getWorldYHeart(), 16, 16);
 
         getPlayerHeartImage();
     }
@@ -46,87 +44,106 @@ public class PlayerHeart extends Battle {
         this.fightMenu = fightMenu;
     }
 
+    public void setPlayerHeartHitbox(Rectangle newHitbox) {
+        heartHitBox = newHitbox;
+    }
+
     public void checkCollision() {
-        battleRectHitbox = fightMenu.setBattleRectHitbox();
+        Rectangle battleRectHitbox = fightMenu.getBattleRectHitbox();
 
         // Top edge of the heart
-        heartTopY = heartHitBox.y;
+        setHeartTopY(heartHitBox.y);
         int rectTopY = battleRectHitbox.y;
 
         // Left side
         int rectLeftX = battleRectHitbox.x;
-        heartLeftX = heartHitBox.x;
+        setHeartLeftX(heartHitBox.x);
 
         // Right side
         int rectRightX = battleRectHitbox.x + battleRectHitbox.width;
-        heartRightX = heartHitBox.x + heartHitBox.width;
+        setHeartRightX(heartHitBox.x + heartHitBox.width);
 
         // Bottom side
         int rectBottomY = battleRectHitbox.y + battleRectHitbox.height;
-        heartBottomY = heartHitBox.y + heartHitBox.height;
+        setHeartBottomY(heartHitBox.y + heartHitBox.height);
 
         // Check each side of the battle rectangle
-        if (heartTopY <= rectTopY) {
-            worldYHeart = rectTopY + 2;
-            heartHitBox.y = worldYHeart;
+        if (getHeartTopY() <= rectTopY) {
+            setWorldYHeart(rectTopY + 2);
+            heartHitBox.y = getWorldYHeart();
         }
-        if (heartBottomY >= rectBottomY) {
-            worldYHeart = rectBottomY - heartHitBox.height - 2;
-            heartHitBox.y = worldYHeart;
+        if (getHeartBottomY() >= rectBottomY) {
+            setWorldYHeart(rectBottomY - heartHitBox.height - 2);
+            heartHitBox.y = getWorldYHeart();
         }
-        if (heartLeftX <= rectLeftX) {
-            worldXHeart = rectLeftX + heartSpeed;
-            heartHitBox.x = worldXHeart;
+        if (getHeartLeftX() <= rectLeftX) {
+            setWorldXHeart(rectLeftX + heartSpeed);
+            heartHitBox.x = getWorldXHeart();
         }
-        if (heartRightX >= rectRightX) {
-            worldXHeart = rectRightX - heartSpeed - heartHitBox.width;
-            heartHitBox.x = worldXHeart;
+        if (getHeartRightX() >= rectRightX) {
+            setWorldXHeart(rectRightX - heartSpeed - heartHitBox.width);
+            heartHitBox.x = getWorldXHeart();
+        }
+    }
+
+    public int getWorldHeart(String coordinate) {
+        switch (coordinate) {
+            case "leftX":
+                return getHeartLeftX();
+            case "rightX":
+                return getHeartRightX();
+            case "topY":
+                return getHeartTopY();
+            case "bottomY":
+                return getHeartBottomY();
+            default:
+                return 0;
         }
     }
 
     public void update() {
-        if (keyH.upPressed && !keyH.rightPressed && !keyH.leftPressed
-                && !keyH.downPressed) {
-            worldYHeart -= heartSpeed;
+        if (keyH.isUpPressed() && !keyH.isRightPressed() && !keyH.isLeftPressed()
+                && !keyH.isDownPressed()) {
+            setWorldYHeart(getWorldYHeart() - heartSpeed);
             heartHitBox.y -= heartSpeed;
         }
-        if (keyH.downPressed && !keyH.rightPressed && !keyH.leftPressed
-                && !keyH.upPressed) {
-            worldYHeart += heartSpeed;
+        if (keyH.isDownPressed() && !keyH.isRightPressed() && !keyH.isLeftPressed()
+                && !keyH.isUpPressed()) {
+            setWorldYHeart(getWorldYHeart() + heartSpeed);
             heartHitBox.y += heartSpeed;
         }
-        if (keyH.leftPressed && !keyH.upPressed && !keyH.downPressed
-                && !keyH.rightPressed) {
-            worldXHeart -= heartSpeed;
+        if (keyH.isLeftPressed() && !keyH.isUpPressed() && !keyH.isDownPressed()
+                && !keyH.isRightPressed()) {
+            setWorldXHeart(getWorldXHeart() - heartSpeed);
             heartHitBox.x -= heartSpeed;
         }
-        if (keyH.rightPressed && !keyH.upPressed && !keyH.downPressed
-                && !keyH.leftPressed) {
-            worldXHeart += heartSpeed;
+        if (keyH.isRightPressed() && !keyH.isUpPressed() && !keyH.isDownPressed()
+                && !keyH.isLeftPressed()) {
+            setWorldXHeart(getWorldXHeart() + heartSpeed);
             heartHitBox.x += heartSpeed;
         }
-        if (keyH.upPressed && keyH.rightPressed) {
-            worldYHeart -= heartSpeed;
-            worldXHeart += heartSpeed;
+        if (keyH.isUpPressed() && keyH.isRightPressed()) {
+            setWorldYHeart(getWorldYHeart() - heartSpeed);
+            setWorldXHeart(getWorldXHeart() + heartSpeed);
             heartHitBox.y -= heartSpeed;
             heartHitBox.x += heartSpeed;
         }
-        if (keyH.upPressed && keyH.leftPressed) {
-            worldYHeart -= heartSpeed;
-            worldXHeart -= heartSpeed;
+        if (keyH.isUpPressed() && keyH.isLeftPressed()) {
+            setWorldYHeart(getWorldYHeart() - heartSpeed);
+            setWorldXHeart(getWorldXHeart() - heartSpeed);
             heartHitBox.y -= heartSpeed;
             heartHitBox.x -= heartSpeed;
 
         }
-        if (keyH.downPressed && keyH.rightPressed) {
-            worldYHeart += heartSpeed;
-            worldXHeart += heartSpeed;
+        if (keyH.isDownPressed() && keyH.isRightPressed()) {
+            setWorldYHeart(getWorldYHeart() + heartSpeed);
+            setWorldXHeart(getWorldXHeart() + heartSpeed);
             heartHitBox.y += heartSpeed;
             heartHitBox.x += heartSpeed;
         }
-        if (keyH.downPressed && keyH.leftPressed) {
-            worldYHeart += heartSpeed;
-            worldXHeart -= heartSpeed;
+        if (keyH.isDownPressed() && keyH.isLeftPressed()) {
+            setWorldYHeart(getWorldYHeart() + heartSpeed);
+            setWorldXHeart(getWorldXHeart() - heartSpeed);
             heartHitBox.y += heartSpeed;
             heartHitBox.x -= heartSpeed;
         }
@@ -138,6 +155,6 @@ public class PlayerHeart extends Battle {
         g2.drawRect(heartHitBox.x, heartHitBox.y, heartHitBox.width,
                 heartHitBox.height);
 
-        g2.drawImage(heart, worldXHeart, worldYHeart, 16, 16, null);
+        g2.drawImage(heart, heartHitBox.x, heartHitBox.y, 16, 16, null);
     }
 }

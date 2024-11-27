@@ -1,63 +1,72 @@
 package semestralka;
 
-import entity.Entity;
+import java.awt.Rectangle;
+
+import entity.Player;
 
 public class HitBoxCheck {
-    GamePanel gp;
+    private GamePanel gp;
+    private Player player;
 
-    public HitBoxCheck(GamePanel gp) {
+    public HitBoxCheck(GamePanel gp, Player player) {
         this.gp = gp;
+        this.player = player;
     }
 
-    public void checkTileCollision(Entity entity) {
-        int entityLeftEdge = entity.worldX + entity.hitBox.x;
-        int entityRightEdge = entity.worldX + entity.hitBox.x + entity.hitBox.width;
-        int entityTopEdge = entity.worldY + entity.hitBox.y;
-        int entityBottomEdge = entity.worldY + entity.hitBox.y + entity.hitBox.height;
+    public void checkTileCollision() {
+        Rectangle hitBox = player.getHitBox();
+        int entityLeftEdge = player.getWorldX() + hitBox.x;
+        int entityRightEdge = player.getWorldX() + hitBox.x + hitBox.width;
+        int entityTopEdge = player.getWorldY() + hitBox.y;
+        int entityBottomEdge = player.getWorldY() + hitBox.y + hitBox.height;
 
-        int leftTileColumn = entityLeftEdge / gp.tileSize;
-        int rightTileColumn = entityRightEdge / gp.tileSize;
-        int topTileRow = entityTopEdge / gp.tileSize;
-        int bottomTileRow = entityBottomEdge / gp.tileSize;
+        int leftTileColumn = entityLeftEdge / gp.getTileSize();
+        int rightTileColumn = entityRightEdge / gp.getTileSize();
+        int topTileRow = entityTopEdge / gp.getTileSize();
+        int bottomTileRow = entityBottomEdge / gp.getTileSize();
 
         int tileId1, tileId2;
 
-        switch (entity.direction) {
+        switch (player.getDirection()) {
             case "up":
-                topTileRow = (entityTopEdge - entity.speed) / gp.tileSize;
-                tileId1 = gp.tileManager.mapTileNumber[leftTileColumn][topTileRow];
-                tileId2 = gp.tileManager.mapTileNumber[rightTileColumn][topTileRow];
-                if (gp.tileManager.tile[tileId1].collision || gp.tileManager.tile[tileId2].collision) {
+                topTileRow = (entityTopEdge - player.getSpeed()) / gp.getTileSize();
+                tileId1 = gp.getTileManager().getMapTileNumber(leftTileColumn, topTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(rightTileColumn, topTileRow);
+                if (gp.getTileManager().getTile(tileId1).isCollision()
+                        || gp.getTileManager().getTile(tileId2).isCollision()) {
                     if (tileId1 == 17 || tileId1 == 18 || tileId1 == 19 || tileId2 == 17 || tileId2 == 18
                             || tileId2 == 19) {
-                        entity.canWalkThroughDoor = true;
+                        player.setWalkThroughDoor(true);
                     } else {
-                        entity.collisionDetected = true;
+                        player.setCollisionDetected(true);
                     }
                 }
                 break;
             case "down":
-                bottomTileRow = (entityBottomEdge + entity.speed) / gp.tileSize;
-                tileId1 = gp.tileManager.mapTileNumber[leftTileColumn][bottomTileRow];
-                tileId2 = gp.tileManager.mapTileNumber[rightTileColumn][bottomTileRow];
-                if (gp.tileManager.tile[tileId1].collision || gp.tileManager.tile[tileId2].collision) {
-                    entity.collisionDetected = true;
+                bottomTileRow = (entityBottomEdge + player.getSpeed()) / gp.getTileSize();
+                tileId1 = gp.getTileManager().getMapTileNumber(leftTileColumn, bottomTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(rightTileColumn, bottomTileRow);
+                if (gp.getTileManager().getTile(tileId1).isCollision()
+                        || gp.getTileManager().getTile(tileId2).isCollision()) {
+                    player.setCollisionDetected(true);
                 }
                 break;
             case "left":
-                leftTileColumn = (entityLeftEdge - entity.speed) / gp.tileSize;
-                tileId1 = gp.tileManager.mapTileNumber[leftTileColumn][topTileRow];
-                tileId2 = gp.tileManager.mapTileNumber[leftTileColumn][bottomTileRow];
-                if (gp.tileManager.tile[tileId1].collision || gp.tileManager.tile[tileId2].collision) {
-                    entity.collisionDetected = true;
+                leftTileColumn = (entityLeftEdge - player.getSpeed()) / gp.getTileSize();
+                tileId1 = gp.getTileManager().getMapTileNumber(leftTileColumn, topTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(leftTileColumn, bottomTileRow);
+                if (gp.getTileManager().getTile(tileId1).isCollision()
+                        || gp.getTileManager().getTile(tileId2).isCollision()) {
+                    player.setCollisionDetected(true);
                 }
                 break;
             case "right":
-                rightTileColumn = (entityRightEdge + entity.speed) / gp.tileSize;
-                tileId1 = gp.tileManager.mapTileNumber[rightTileColumn][topTileRow];
-                tileId2 = gp.tileManager.mapTileNumber[rightTileColumn][bottomTileRow];
-                if (gp.tileManager.tile[tileId1].collision || gp.tileManager.tile[tileId2].collision) {
-                    entity.collisionDetected = true;
+                rightTileColumn = (entityRightEdge + player.getSpeed()) / gp.getTileSize();
+                tileId1 = gp.getTileManager().getMapTileNumber(rightTileColumn, topTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(rightTileColumn, bottomTileRow);
+                if (gp.getTileManager().getTile(tileId1).isCollision()
+                        || gp.getTileManager().getTile(tileId2).isCollision()) {
+                    player.setCollisionDetected(true);
                 }
                 break;
             default:

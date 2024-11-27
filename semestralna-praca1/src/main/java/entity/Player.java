@@ -18,8 +18,11 @@ public class Player extends Entity {
     private TileManager tileManager;
     private Battle battle;
 
-    public final int screenX;
-    public final int screenY;
+    private final int screenX;
+    private final int screenY;
+    private BufferedImage up1, up2, down1, down2, left1, left2, right1, right2;
+    private int spriteCounter = 0;
+    private int imageNumber = 1;
     private int level;
 
     public Player(GamePanel gp, KeyHandler keyH, Battle battle) {
@@ -29,20 +32,20 @@ public class Player extends Entity {
 
         this.level = 2;
 
-        screenX = gp.screenWidth / 2;
-        screenY = gp.screenHeight / 2;
+        screenX = gp.getScreenWidth() / 2;
+        screenY = gp.getScreenHeight() / 2;
 
-        hitBox = new Rectangle(10, 20, 20, 20);
+        setHitBox(new Rectangle(10, 20, 20, 20));
 
-        setDefaultValues(gp.tileSize * 3, gp.tileSize * 3);
+        setDefaultValues(gp.getTileSize() * 3, gp.getTileSize() * 3);
         getPlayerImage();
     }
 
     public void setDefaultValues(int x, int y) {
-        worldX = x; // Set spawn X from TileManager or default
-        worldY = y; // Set spawn Y from TileManager or default
-        speed = 3;
-        direction = "down";
+        setWorldX(x); // Set spawn X from TileManager or default
+        setWorldY(y); // Set spawn Y from TileManager or default
+        setSpeed(3);
+        setDirection("down");
     }
 
     public void setTileManager(TileManager tileManager) {
@@ -64,57 +67,67 @@ public class Player extends Entity {
         }
     }
 
+    public int getScreenX() {
+        return screenX;
+    }
+
+    public int getScreenY() {
+        return screenY;
+    }
+
     public void update() {
-        if (keyH.upPressed == true) {
-            direction = "up";
+        int speed = getSpeed();
+        if (keyH.isUpPressed() == true) {
+            setDirection("up");
 
-        } else if (keyH.downPressed == true) {
-            direction = "down";
+        } else if (keyH.isDownPressed() == true) {
+            setDirection("down");
 
-        } else if (keyH.leftPressed == true) {
-            direction = "left";
+        } else if (keyH.isLeftPressed() == true) {
+            setDirection("left");
 
-        } else if (keyH.rightPressed == true) {
-            direction = "right";
+        } else if (keyH.isRightPressed() == true) {
+            setDirection("right");
+
         } else {
             imageNumber = 1;
             return;
         }
 
-        collisionDetected = false;
-        gp.hitBoxCheck.checkTileCollision(this);
+        setCollisionDetected(false);
+        gp.getHitBoxCheck().checkTileCollision();
 
-        if (!collisionDetected) {
-            if (keyH.upPressed && !keyH.rightPressed && !keyH.leftPressed
-                    && !keyH.downPressed) {
-                worldY -= speed;
-            } else if (keyH.downPressed && !keyH.rightPressed && !keyH.leftPressed
-                    && !keyH.upPressed) {
-                worldY += speed;
-            } else if (keyH.leftPressed && !keyH.upPressed && !keyH.downPressed
-                    && !keyH.rightPressed) {
-                worldX -= speed;
-            } else if (keyH.rightPressed && !keyH.upPressed && !keyH.downPressed
-                    && !keyH.leftPressed) {
-                worldX += speed;
-            } else if (keyH.upPressed && keyH.rightPressed) {
-                worldY -= speed;
-                worldX += speed;
-            } else if (keyH.upPressed && keyH.leftPressed) {
-                worldY -= speed;
-                worldX -= speed;
-            } else if (keyH.downPressed && keyH.rightPressed) {
-                worldY += speed;
-                worldX += speed;
-            } else if (keyH.downPressed && keyH.leftPressed) {
-                worldY += speed;
-                worldX -= speed;
+        if (!isCollisionDetected()) {
+            if (keyH.isUpPressed() && !keyH.isRightPressed() && !keyH.isLeftPressed()
+                    && !keyH.isDownPressed()) {
+                setWorldY(getWorldY() - speed);
+            } else if (keyH.isDownPressed() && !keyH.isRightPressed() && !keyH.isLeftPressed()
+                    && !keyH.isUpPressed()) {
+                setWorldY(getWorldY() + speed);
+            } else if (keyH.isLeftPressed() && !keyH.isUpPressed() && !keyH.isDownPressed()
+                    && !keyH.isRightPressed()) {
+                setWorldX(getWorldX() - speed);
+            } else if (keyH.isRightPressed() && !keyH.isUpPressed() && !keyH.isDownPressed()
+                    && !keyH.isLeftPressed()) {
+                setWorldX(getWorldX() + speed);
+            } else if (keyH.isUpPressed() && keyH.isRightPressed()) {
+                setWorldY(getWorldY() - speed);
+                setWorldX(getWorldX() + speed);
+            } else if (keyH.isUpPressed() && keyH.isLeftPressed()) {
+                setWorldY(getWorldY() - speed);
+                setWorldX(getWorldX() - speed);
+            } else if (keyH.isDownPressed() && keyH.isRightPressed()) {
+                setWorldY(getWorldY() + speed);
+                setWorldX(getWorldX() + speed);
+            } else if (keyH.isDownPressed() && keyH.isLeftPressed()) {
+                setWorldY(getWorldY() + speed);
+                setWorldX(getWorldX() - speed);
             }
         }
 
-        if (canWalkThroughDoor) {
+        if (isWalkThroughDoor()) {
             this.tileManager.loadMap(String.format("/res/maps/map00%s.txt", level));
-            canWalkThroughDoor = false;
+            setWalkThroughDoor(false);
         }
 
         spriteCounter++;
@@ -130,10 +143,10 @@ public class Player extends Entity {
     }
 
     public void draw(Graphics2D g2) {
-        if (!battle.fightMenu) {
+        if (battle.getFightMenu() == false) {
             BufferedImage image = null;
 
-            switch (direction) {
+            switch (getDirection()) {
                 case "up":
                     if (imageNumber == 1) {
                         image = up1;
@@ -167,7 +180,8 @@ public class Player extends Entity {
                     }
                     break;
             }
-            g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            Rectangle hitBox = getHitBox();
+            g2.drawImage(image, screenX, screenY, gp.getTileSize(), gp.getTileSize(), null);
             g2.setColor(java.awt.Color.RED);
             g2.drawRect(screenX + hitBox.x, screenY + hitBox.y, 20, 20);
 

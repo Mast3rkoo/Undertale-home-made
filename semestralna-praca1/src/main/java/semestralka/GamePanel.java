@@ -4,11 +4,9 @@ import javax.swing.JPanel;
 
 import battle.FightMenu;
 import entity.Player;
-import tile.Tile;
 import tile.TileManager;
 import battle.Battle;
 import battle.PlayerHeart;
-import battle.Projectile;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,30 +17,29 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Screen dimensions
     private final int originalTileSize = 20;
-    public final int scale = 2;
+    private final int scale = 2;
 
-    public final int tileSize = originalTileSize * scale;
-    public final int maxScreenCol = 80;
-    public final int maxScreenRow = 20;
-    public final int screenWidth = tileSize * 16;
-    public final int screenHeight = tileSize * 12;
+    private final int tileSize = originalTileSize * scale;
+    // private final int maxScreenCol = 80;
+    // private final int maxScreenRow = 20;
+    private final int screenWidth = tileSize * 16;
+    private final int screenHeight = tileSize * 12;
 
     // WORLD SETTINGS
-    public final int maxWorldColumn = 26;
-    public final int maxWorldRow = 12;
-    public final int worldWidth = tileSize * 16;
-    public final int worldHeight = tileSize * 12;
-    public double delta;
+    private final int maxWorldColumn = 26;
+    private final int maxWorldRow = 12;
+    // private final int worldWidth = tileSize * 16;
+    // private final int worldHeight = tileSize * 12;
+    private double delta;
 
-    KeyHandler keyH = new KeyHandler();
-    Thread gameThread;
-    public HitBoxCheck hitBoxCheck = new HitBoxCheck(this);
-    public Tile tile = new Tile();
-    public Battle battle = new Battle();
-    public FightMenu fightMenu;
-    public Player player;
-    public TileManager tileManager;
-    public PlayerHeart playerHeart;
+    private KeyHandler keyH = new KeyHandler();
+    private Thread gameThread;
+    private HitBoxCheck hitBoxCheck;
+    private Battle battle = new Battle(this);
+    private FightMenu fightMenu;
+    private Player player;
+    private TileManager tileManager;
+    private PlayerHeart playerHeart;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -51,11 +48,44 @@ public class GamePanel extends JPanel implements Runnable {
         this.addKeyListener(keyH);
         this.setFocusable(true);
         player = new Player(this, keyH, battle);
+        hitBoxCheck = new HitBoxCheck(this, player);
         tileManager = new TileManager(this);
         player.setTileManager(tileManager);
         playerHeart = new PlayerHeart(this, keyH);
         fightMenu = new FightMenu(this, keyH, playerHeart);
         playerHeart.setFightMenu(fightMenu);
+    }
+
+    public int getTileSize() {
+        return tileSize;
+    }
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
+    }
+
+    public int getMaxWorldColumn() {
+        return maxWorldColumn;
+    }
+
+    public int getMaxWorldRow() {
+        return maxWorldRow;
+    }
+
+    public HitBoxCheck getHitBoxCheck() {
+        return hitBoxCheck;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public TileManager getTileManager() {
+        return tileManager;
     }
 
     public void startGameThread() {
@@ -90,21 +120,21 @@ public class GamePanel extends JPanel implements Runnable {
 
     long lastLogTime = 0;
 
-    public void changeFightMenu() {
-        battle.fightMenu = !battle.fightMenu;
+    public void changeFightMenu(boolean state) {
+        battle.setFightMenu(state);
     }
 
     public void changeTurn(String turn) {
         if (turn == "+") {
-            battle.numberOfTurn++;
+            fightMenu.setTurn(1);
         } else {
-            battle.numberOfTurn--;
+            fightMenu.setTurn(0);
         }
     }
 
     public void updateGame() {
         long currentTime = System.currentTimeMillis();
-        if (!battle.fightMenu) {
+        if (!battle.getFightMenu()) {
             player.update();
             if (currentTime - lastLogTime >= 1000) {
                 System.out.println("Player is moving");
@@ -112,7 +142,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
         } else {
             fightMenu.update();
-            if (battle.numberOfTurn == 1) {
+            if (fightMenu.getNumberOfTurn() == 1) {
                 playerHeart.update();
             }
             if (currentTime - lastLogTime >= 1000) {
@@ -126,12 +156,12 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
-        if (!battle.fightMenu) {
+        if (!battle.getFightMenu()) {
             tileManager.draw(g2);
             player.draw(g2);
         } else {
             fightMenu.drawFightMenu(g2);
-            if (battle.numberOfTurn == 1) {
+            if (fightMenu.getNumberOfTurn() == 1) {
                 playerHeart.draw(g2);
             }
         }

@@ -18,10 +18,10 @@ import semestralka.GamePanel;
 import semestralka.KeyHandler;
 
 public class FightMenu extends Battle {
-    GamePanel gp;
-    KeyHandler keyH;
-    Projectile projectile;
-    PlayerHeart playerHeart;
+    private GamePanel gp;
+    private KeyHandler keyH;
+    private Projectile projectile;
+    private PlayerHeart playerHeart;
     private BufferedImage heart;
     private BufferedImage actionButtons;
     private BufferedImage flowey;
@@ -35,28 +35,24 @@ public class FightMenu extends Battle {
     private Random random;
     private int numberOfSprite;
     private String battleMessage;
+    private ArrayList<Projectile> projectiles;
     private List<Projectile> tempProjectiles;
+    private int xOfBattleRect, widthOfBattleRect;
 
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
+        super(gp);
         this.gp = gp;
         this.keyH = keyH;
         this.playerHeart = playerHeart;
 
         random = new Random();
-        heartLocationX = gp.screenWidth / 13;
+        heartLocationX = gp.getScreenWidth() / 13;
         hpOfEnemy = 100;
         numberOfSprite = 0;
-        xOfBattleRect = gp.screenWidth / 10;
-        yOfBattleRect = gp.tileSize * 5;
         battleMessage = "Flowey wants to fight!";
-        widthOfBattleRect = gp.screenWidth - 80;
-        heightOfBattleRect = 170;
 
         projectiles = new ArrayList<>();
         tempProjectiles = new ArrayList<>();
-        playerHealth = 100;
-
-        battleRectHitbox = new Rectangle(xOfBattleRect, yOfBattleRect, widthOfBattleRect, 170);
 
         getFightMenuImages();
         splitImagesActions();
@@ -107,13 +103,10 @@ public class FightMenu extends Battle {
         }
     }
 
-    public Rectangle setBattleRectHitbox() {
-        return new Rectangle(xOfBattleRect, gp.tileSize * 5, widthOfBattleRect, 170);
-    }
-
     public void enemyAttack() {
         gp.changeTurn("+");
-        numberOfTurn++;
+        setNumberOfTurn(1);
+        setBattleTurn();
         int numberOfProjectiles = random.nextInt(10) + 30;
         int randomSide = random.nextInt(3);
         String side = "";
@@ -140,28 +133,38 @@ public class FightMenu extends Battle {
         tempProjectiles = new ArrayList<>(projectiles);
     }
 
+    public void changeHealth(int health) {
+        setPlayerHealth(getPlayerHealth() - health);
+    }
+
+    public void setTurn(int numberOfTurn) {
+        setNumberOfTurn(numberOfTurn);
+    }
+
     public void update() {
+
+        int numberOfTurn = getNumberOfTurn();
         // Action choices movement
-        if (hpOfEnemy <= 0 || playerHealth <= 0) {
-            gp.changeFightMenu();
+        if (hpOfEnemy <= 0 || getPlayerHealth() <= 0) {
+            gp.changeFightMenu(false);
         }
 
         if (numberOfTurn == 0) {
-            int spaceBetweenButtons = gp.screenWidth / 16 + subImageWidthActions;
-            if (keyH.rightPressed && positionOfHeart <= 2 && positionOfHeart >= 0) {
+            int spaceBetweenButtons = gp.getScreenWidth() / 16 + subImageWidthActions;
+            if (keyH.isRightPressed() && positionOfHeart <= 2 && positionOfHeart >= 0) {
                 heartLocationX += spaceBetweenButtons;
                 positionOfHeart++;
-                keyH.rightPressed = false;
-            } else if (keyH.leftPressed && positionOfHeart >= 1 && positionOfHeart <= 3) {
+                keyH.setRightPressed(false);
+            } else if (keyH.isLeftPressed() && positionOfHeart >= 1 && positionOfHeart <= 3) {
                 heartLocationX -= spaceBetweenButtons;
                 positionOfHeart--;
-                keyH.leftPressed = false;
+                keyH.setLeftPressed(false);
             }
-            if (keyH.enterPressed && positionOfHeart == 0 && hpOfEnemy > 0 && numberOfTurn == 0) {
+            if (keyH.isEnterPressed() && positionOfHeart == 0 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 // Attack logic
                 numberOfSprite = 3;
                 hpOfEnemy -= random.nextInt(21) + 10;
-                keyH.enterPressed = false;
+                keyH.setEnterPressed(false);
                 // Changes sprite to make it look like it hurt the enemy and then changes it
                 // back to 0 meaning the normal state after 1 second
                 Timer timer = new Timer(1500, e -> {
@@ -171,30 +174,30 @@ public class FightMenu extends Battle {
                 timer.setRepeats(false);
                 timer.start();
                 enemyAttack();
-            } else if (keyH.enterPressed && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 0) {
+            } else if (keyH.isEnterPressed() && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 System.out.println("You chose to act on the enemy");
-            } else if (keyH.enterPressed && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0) {
-                if (playerHealth < 100) {
-                    playerHealth += random.nextInt(21) + 10;
+            } else if (keyH.isEnterPressed() && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0) {
+                if (getPlayerHealth() < 100) {
+                    setPlayerHealth(getPlayerHealth() + random.nextInt(21) + 10);
                 }
-                keyH.enterPressed = false;
+                keyH.setEnterPressed(false);
                 enemyAttack();
-            } else if (keyH.enterPressed && positionOfHeart == 3 && hpOfEnemy > 0 && numberOfTurn == 0) {
+            } else if (keyH.isEnterPressed() && positionOfHeart == 3 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 double chanceOfSpare = random.nextDouble() - hpOfEnemy / 1000 * 5;
                 if (chanceOfSpare > 0.7) {
                     System.out.println("You spared the enemy with an " + chanceOfSpare + " chance");
-                    gp.changeFightMenu();
+                    gp.changeFightMenu(false);
                 } else {
                     enemyAttack();
                 }
-                keyH.enterPressed = false;
+                keyH.setEnterPressed(false);
             }
         }
 
         if (projectiles.size() > 0) {
             for (Projectile projectile : tempProjectiles) {
                 projectile.update();
-                if (!projectile.bulletActive) {
+                if (!projectile.getBulletActive()) {
                     projectiles.remove(projectile);
                 }
             }
@@ -203,26 +206,29 @@ public class FightMenu extends Battle {
         if (projectiles.size() == 0 && numberOfTurn == 1) {
             gp.changeTurn("-");
             numberOfTurn--;
+            setBattleTurn();
         }
     }
 
     public void setBattleTurn() {
-        if (numberOfTurn == 1) {
-            widthOfBattleRect = (gp.screenWidth - 80) / 2;
-            xOfBattleRect = (gp.screenWidth - widthOfBattleRect) / 2;
+        xOfBattleRect = getXOfBattleRect();
+        widthOfBattleRect = getWidthOfBattleRect();
+        if (getNumberOfTurn() == 1) {
+            setWidthOfBattleRect((gp.getScreenWidth() - 80) / 2);
+            setXOfBattleRect((gp.getScreenWidth() - widthOfBattleRect) / 2);
             battleMessage = "";
         } else {
-            playerHeart.worldXHeart = (gp.screenWidth - 16) / 2;
-            playerHeart.worldYHeart = (gp.screenHeight + 170 / 2) / 2;
-            playerHeart.heartHitBox = new Rectangle(playerHeart.worldXHeart, playerHeart.worldYHeart, 16, 16);
-            widthOfBattleRect = gp.screenWidth - 80;
-            xOfBattleRect = gp.tileSize;
+            setWorldXHeart((gp.getScreenWidth() - 16) / 2);
+            setWorldYHeart((gp.getScreenHeight() + 170 / 2) / 2);
+            playerHeart.setPlayerHeartHitbox(new Rectangle(getWorldXHeart(), getWorldYHeart(), 16, 16));
+            setWidthOfBattleRect(gp.getScreenWidth() - 80);
+            setXOfBattleRect(gp.getTileSize());
             battleMessage = "Flowey wants to fight!";
         }
-        battleRectHitbox.setBounds(xOfBattleRect, yOfBattleRect, widthOfBattleRect, 170);
     }
 
     public void makeProjectile(int speed, int damage, String whichSide) {
+        setBattleTurn();
         projectile = new Projectile(gp, playerHeart);
         projectile.setFightMenu(this, whichSide);
         projectiles.add(projectile);
@@ -230,27 +236,31 @@ public class FightMenu extends Battle {
     }
 
     public void drawFightMenu(Graphics2D g2) {
-        int xOfButton = gp.screenWidth / 16;
-        int yOfButton = gp.screenHeight - gp.screenHeight / 7;
-        if (fightMenu) {
+        int xOfButton = gp.getScreenWidth() / 16;
+        int yOfButton = gp.getScreenHeight() - gp.getScreenHeight() / 7;
+
+        if (getFightMenu() == true) {
+            setBattleTurn();
             g2.setColor(Color.WHITE);
             g2.setStroke(new BasicStroke(3));
-            setBattleTurn();
-            g2.drawRect(xOfBattleRect, gp.tileSize * 5, widthOfBattleRect, 170);
+            g2.drawRect(xOfBattleRect, gp.getTileSize() * 5, widthOfBattleRect, 170);
+
             g2.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-            g2.drawString(battleMessage, gp.screenWidth / 10, gp.screenHeight / 2);
+            g2.drawString(battleMessage, gp.getScreenWidth() / 10, gp.getScreenHeight() / 2);
 
             // Enemy
-            g2.drawImage(floweyImages[numberOfSprite], (gp.screenWidth - (floweyImages[0].getWidth() * 2 + 20)) / 2,
-                    gp.tileSize,
+            g2.drawImage(floweyImages[numberOfSprite],
+                    (gp.getScreenWidth() - (floweyImages[0].getWidth() * 2 + 20)) / 2,
+                    gp.getTileSize(),
                     floweyImages[0].getWidth() * 2 + 20,
                     floweyImages[0].getHeight() * 2 + 20, null);
             // Enemy health bar
             g2.setColor(Color.RED);
-            g2.fillRect((gp.screenWidth - (floweyImages[0].getWidth() * 2 + 20)) / 2, gp.tileSize * 4, 100,
+            g2.fillRect((gp.getScreenWidth() - (floweyImages[0].getWidth() * 2 + 20)) / 2, gp.getTileSize() * 4, 100,
                     15);
             g2.setColor(Color.GREEN);
-            g2.fillRect((gp.screenWidth - (floweyImages[0].getWidth() * 2 + 20)) / 2, gp.tileSize * 4, hpOfEnemy,
+            g2.fillRect((gp.getScreenWidth() - (floweyImages[0].getWidth() * 2 + 20)) / 2, gp.getTileSize() * 4,
+                    hpOfEnemy,
                     15);
 
             switch (positionOfHeart) {
@@ -319,12 +329,13 @@ public class FightMenu extends Battle {
             // Heart health bar
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
-            g2.drawString("HP: " + playerHealth, gp.screenWidth / 2 - 7 * 19,
-                    gp.screenHeight - gp.screenHeight / 5 + 15);
+            g2.drawString("HP: " + getPlayerHealth(), gp.getScreenWidth() / 2 - 7 * 19,
+                    gp.getScreenHeight() - gp.getScreenHeight() / 5 + 15);
             g2.setColor(Color.RED);
-            g2.fillRect(gp.screenWidth / 2 - 50, gp.screenHeight - gp.screenHeight / 5, 100, 15);
+            g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5, 100, 15);
             g2.setColor(Color.GREEN);
-            g2.fillRect(gp.screenWidth / 2 - 50, gp.screenHeight - gp.screenHeight / 5, playerHealth, 15);
+            g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5,
+                    getPlayerHealth(), 15);
 
             for (Projectile projectile : tempProjectiles) {
                 projectile.draw(g2);
