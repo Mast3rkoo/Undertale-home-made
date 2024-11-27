@@ -24,6 +24,7 @@ public class Player extends Entity {
     private int spriteCounter = 0;
     private int imageNumber = 1;
     private int level;
+    private int widthOfPlayerHitbox, heightOfPlayerHitbox;
 
     public Player(GamePanel gp, KeyHandler keyH, Battle battle) {
         this.gp = gp;
@@ -35,7 +36,10 @@ public class Player extends Entity {
         screenX = gp.getScreenWidth() / 2;
         screenY = gp.getScreenHeight() / 2;
 
-        setHitBox(new Rectangle(10, 20, 20, 20));
+        widthOfPlayerHitbox = 30;
+        heightOfPlayerHitbox = 30;
+
+        setHitBox(new Rectangle(10, 20, widthOfPlayerHitbox, heightOfPlayerHitbox));
 
         setDefaultValues(gp.getTileSize() * 3, gp.getTileSize() * 3);
         getPlayerImage();
@@ -44,12 +48,17 @@ public class Player extends Entity {
     public void setDefaultValues(int x, int y) {
         setWorldX(x); // Set spawn X from TileManager or default
         setWorldY(y); // Set spawn Y from TileManager or default
-        setSpeed(3);
+        setSpeed(4);
         setDirection("down");
     }
 
     public void setTileManager(TileManager tileManager) {
         this.tileManager = tileManager;
+    }
+
+    public void setEncounter(boolean fightMenu) {
+        System.out.println("Setting fight menu to " + fightMenu);
+        gp.drawEncounter(fightMenu);
     }
 
     public void getPlayerImage() {
@@ -127,7 +136,9 @@ public class Player extends Entity {
 
         if (isWalkThroughDoor()) {
             this.tileManager.loadMap(String.format("/res/maps/map00%s.txt", level));
+            setDefaultValues(gp.getTileSize() * 5, gp.getTileSize() * 7);
             setWalkThroughDoor(false);
+            this.level++;
         }
 
         spriteCounter++;
@@ -181,9 +192,9 @@ public class Player extends Entity {
                     break;
             }
             Rectangle hitBox = getHitBox();
-            g2.drawImage(image, screenX, screenY, gp.getTileSize(), gp.getTileSize(), null);
+            g2.drawImage(image, screenX, screenY, gp.getTileSize() + 10, gp.getTileSize() + 10, null);
             g2.setColor(java.awt.Color.RED);
-            g2.drawRect(screenX + hitBox.x, screenY + hitBox.y, 20, 20);
+            g2.drawRect(screenX + hitBox.x, screenY + hitBox.y, widthOfPlayerHitbox, heightOfPlayerHitbox);
 
         }
 

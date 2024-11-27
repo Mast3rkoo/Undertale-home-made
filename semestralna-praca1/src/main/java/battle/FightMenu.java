@@ -24,12 +24,10 @@ public class FightMenu extends Battle {
     private PlayerHeart playerHeart;
     private BufferedImage heart;
     private BufferedImage actionButtons;
-    private BufferedImage flowey;
-    private BufferedImage[] floweyImages = new BufferedImage[4];
+    private BufferedImage[] enemyImages = new BufferedImage[4];
     private BufferedImage[] actionButtonImages = new BufferedImage[8];
     private int subImageWidthActions;
     private int subImageHeightActions;
-    private int heartLocationX;
     private int positionOfHeart = 0;
     private int hpOfEnemy;
     private Random random;
@@ -38,6 +36,10 @@ public class FightMenu extends Battle {
     private ArrayList<Projectile> projectiles;
     private List<Projectile> tempProjectiles;
     private int xOfBattleRect, widthOfBattleRect;
+    private int xOfButton, yOfButton;
+    private int buttonImageWidth, buttonImageHeight;
+    private int gapBetweenButtons;
+    private int heartLocationX, heartLocationY;
 
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         super(gp);
@@ -46,10 +48,17 @@ public class FightMenu extends Battle {
         this.playerHeart = playerHeart;
 
         random = new Random();
-        heartLocationX = gp.getScreenWidth() / 13;
         hpOfEnemy = 100;
         numberOfSprite = 0;
         battleMessage = "Flowey wants to fight!";
+
+        xOfButton = gp.getScreenWidth() / 5;
+        yOfButton = gp.getScreenHeight() - gp.getScreenHeight() / 7;
+
+        gapBetweenButtons = gp.getScreenWidth() / 32;
+
+        heartLocationX = xOfButton + 13;
+        heartLocationY = yOfButton + 18;
 
         projectiles = new ArrayList<>();
         tempProjectiles = new ArrayList<>();
@@ -62,16 +71,18 @@ public class FightMenu extends Battle {
         try {
             actionButtons = ImageIO.read(getClass().getResourceAsStream("/res/fightMenu/action-choices.png"));
             heart = ImageIO.read(getClass().getResourceAsStream("/res/fightMenu/heart.png"));
-            flowey = ImageIO.read(getClass().getResourceAsStream("/res/enemy/flowey.png"));
+            enemyImages = getFloweyImages();
         } catch (IOException i) {
             i.printStackTrace();
         }
-        splitImagesEnemy(flowey, 4, floweyImages);
     }
 
     public void splitImagesActions() {
         subImageWidthActions = actionButtons.getWidth() / 2;
         subImageHeightActions = actionButtons.getHeight() / 4;
+
+        buttonImageWidth = subImageWidthActions * 3 / 2;
+        buttonImageHeight = subImageHeightActions * 3 / 2;
 
         int index = 0;
         for (int row = 0; row < 4; row++) {
@@ -81,23 +92,6 @@ public class FightMenu extends Battle {
                         row * subImageHeightActions,
                         subImageWidthActions,
                         subImageHeightActions);
-                index++;
-            }
-        }
-    }
-
-    public void splitImagesEnemy(BufferedImage image, int imageCount, BufferedImage[] imagesArray) {
-        int subImageWidth = image.getWidth() / 2;
-        int subImageHeight = image.getHeight() / (imageCount / 2);
-
-        int index = 0;
-        for (int row = 0; row < imageCount / 2; row++) {
-            for (int col = 0; col < 2; col++) {
-                imagesArray[index] = image.getSubimage(
-                        col * subImageWidth,
-                        row * subImageHeight,
-                        subImageWidth,
-                        subImageHeight);
                 index++;
             }
         }
@@ -127,7 +121,7 @@ public class FightMenu extends Battle {
                 break;
         }
         while (numberOfProjectiles > 0) {
-            makeProjectile(2, random.nextInt(10) + 10, side);
+            makeProjectile(4, random.nextInt(10) + 10, side);
             numberOfProjectiles--;
         }
         tempProjectiles = new ArrayList<>(projectiles);
@@ -146,11 +140,13 @@ public class FightMenu extends Battle {
         int numberOfTurn = getNumberOfTurn();
         // Action choices movement
         if (hpOfEnemy <= 0 || getPlayerHealth() <= 0) {
+            gp.resetEncounterTile(2);
             gp.changeFightMenu(false);
+            return;
         }
 
         if (numberOfTurn == 0) {
-            int spaceBetweenButtons = gp.getScreenWidth() / 16 + subImageWidthActions;
+            int spaceBetweenButtons = buttonImageWidth + gapBetweenButtons;
             if (keyH.isRightPressed() && positionOfHeart <= 2 && positionOfHeart >= 0) {
                 heartLocationX += spaceBetweenButtons;
                 positionOfHeart++;
@@ -167,7 +163,7 @@ public class FightMenu extends Battle {
                 keyH.setEnterPressed(false);
                 // Changes sprite to make it look like it hurt the enemy and then changes it
                 // back to 0 meaning the normal state after 1 second
-                Timer timer = new Timer(1500, e -> {
+                Timer timer = new Timer(1500, _ -> {
                     numberOfSprite = 0; // Reset sprite to 0
                     gp.repaint();
                 });
@@ -184,9 +180,11 @@ public class FightMenu extends Battle {
                 enemyAttack();
             } else if (keyH.isEnterPressed() && positionOfHeart == 3 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 double chanceOfSpare = random.nextDouble() - hpOfEnemy / 1000 * 5;
-                if (chanceOfSpare > 0.7) {
+                if (chanceOfSpare > 0.0) {
                     System.out.println("You spared the enemy with an " + chanceOfSpare + " chance");
+                    gp.resetEncounterTile(2);
                     gp.changeFightMenu(false);
+                    return;
                 } else {
                     enemyAttack();
                 }
@@ -214,15 +212,15 @@ public class FightMenu extends Battle {
         xOfBattleRect = getXOfBattleRect();
         widthOfBattleRect = getWidthOfBattleRect();
         if (getNumberOfTurn() == 1) {
-            setWidthOfBattleRect((gp.getScreenWidth() - 80) / 2);
+            setWidthOfBattleRect(gp.getScreenWidth() / 3);
             setXOfBattleRect((gp.getScreenWidth() - widthOfBattleRect) / 2);
             battleMessage = "";
         } else {
             setWorldXHeart((gp.getScreenWidth() - 16) / 2);
             setWorldYHeart((gp.getScreenHeight() + 170 / 2) / 2);
             playerHeart.setPlayerHeartHitbox(new Rectangle(getWorldXHeart(), getWorldYHeart(), 16, 16));
-            setWidthOfBattleRect(gp.getScreenWidth() - 80);
-            setXOfBattleRect(gp.getTileSize());
+            setWidthOfBattleRect(buttonImageWidth * 4 + gapBetweenButtons * 3);
+            setXOfBattleRect(xOfButton);
             battleMessage = "Flowey wants to fight!";
         }
     }
@@ -236,110 +234,130 @@ public class FightMenu extends Battle {
     }
 
     public void drawFightMenu(Graphics2D g2) {
-        int xOfButton = gp.getScreenWidth() / 16;
-        int yOfButton = gp.getScreenHeight() - gp.getScreenHeight() / 7;
+        setBattleTurn();
+        // Rectangle battleRect = getBattleRectHitbox();
+        // g2.setColor(Color.green);
+        // g2.drawRect(battleRect.x, battleRect.y, battleRect.width, battleRect.height);
+        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(3));
+        g2.drawRect(xOfBattleRect, gp.getScreenHeight() / 3, widthOfBattleRect,
+                getHeightOfBattleRect());
 
-        if (getFightMenu() == true) {
-            setBattleTurn();
-            g2.setColor(Color.WHITE);
-            g2.setStroke(new BasicStroke(3));
-            g2.drawRect(xOfBattleRect, gp.getTileSize() * 5, widthOfBattleRect, 170);
+        g2.setFont(new Font("TimesRoman", Font.PLAIN, 25));
+        g2.drawString(battleMessage, xOfBattleRect + battleMessage.length(),
+                gp.getScreenHeight() / 3 + battleMessage.length() * 2);
 
-            g2.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-            g2.drawString(battleMessage, gp.getScreenWidth() / 10, gp.getScreenHeight() / 2);
+        // Enemy
+        g2.drawImage(enemyImages[numberOfSprite],
+                (gp.getScreenWidth() - (enemyImages[0].getWidth() * 3)) / 2,
+                gp.getTileSize(),
+                enemyImages[0].getWidth() * 3,
+                enemyImages[0].getHeight() * 3, null);
+        // Enemy health bar
+        g2.setColor(Color.RED);
+        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10, gp.getScreenHeight() / 4, 100,
+                15);
+        g2.setColor(Color.GREEN);
+        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10, gp.getScreenHeight() / 4,
+                hpOfEnemy,
+                15);
 
-            // Enemy
-            g2.drawImage(floweyImages[numberOfSprite],
-                    (gp.getScreenWidth() - (floweyImages[0].getWidth() * 2 + 20)) / 2,
-                    gp.getTileSize(),
-                    floweyImages[0].getWidth() * 2 + 20,
-                    floweyImages[0].getHeight() * 2 + 20, null);
-            // Enemy health bar
-            g2.setColor(Color.RED);
-            g2.fillRect((gp.getScreenWidth() - (floweyImages[0].getWidth() * 2 + 20)) / 2, gp.getTileSize() * 4, 100,
-                    15);
-            g2.setColor(Color.GREEN);
-            g2.fillRect((gp.getScreenWidth() - (floweyImages[0].getWidth() * 2 + 20)) / 2, gp.getTileSize() * 4,
-                    hpOfEnemy,
-                    15);
+        switch (positionOfHeart) {
+            case 0:
+                g2.drawImage(actionButtonImages[1], xOfButton, yOfButton, buttonImageWidth,
+                        buttonImageHeight,
+                        null);
+                g2.drawImage(actionButtonImages[2], xOfButton + buttonImageWidth + gapBetweenButtons,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[4], xOfButton + buttonImageWidth * 2 +
+                        gapBetweenButtons * 2,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[6], xOfButton + buttonImageWidth * 3 +
+                        gapBetweenButtons * 3,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                break;
+            case 1:
+                g2.drawImage(actionButtonImages[0], xOfButton, yOfButton, buttonImageWidth,
+                        buttonImageHeight,
+                        null);
+                g2.drawImage(actionButtonImages[3], xOfButton + buttonImageWidth + gapBetweenButtons,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[4], xOfButton + buttonImageWidth * 2 +
+                        gapBetweenButtons * 2,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[6], xOfButton + buttonImageWidth * 3 +
+                        gapBetweenButtons * 3,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                break;
+            case 2:
+                g2.drawImage(actionButtonImages[0], xOfButton, yOfButton, buttonImageWidth,
+                        buttonImageHeight,
+                        null);
+                g2.drawImage(actionButtonImages[2], xOfButton + buttonImageWidth + gapBetweenButtons,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[5], xOfButton + buttonImageWidth * 2 +
+                        gapBetweenButtons * 2,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[6], xOfButton + buttonImageWidth * 3 +
+                        gapBetweenButtons * 3,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                break;
+            case 3:
+                g2.drawImage(actionButtonImages[0], xOfButton, yOfButton, buttonImageWidth,
+                        buttonImageHeight,
+                        null);
+                g2.drawImage(actionButtonImages[2], xOfButton + buttonImageWidth + gapBetweenButtons,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[4], xOfButton + buttonImageWidth * 2 +
+                        gapBetweenButtons * 2,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                g2.drawImage(actionButtonImages[7], xOfButton + buttonImageWidth * 3 +
+                        gapBetweenButtons * 3,
+                        yOfButton,
+                        buttonImageWidth,
+                        buttonImageHeight, null);
+                break;
+            default:
+                break;
+        }
+        // Heart
+        g2.drawImage(heart, heartLocationX, heartLocationY, 26, 26, null);
 
-            switch (positionOfHeart) {
-                case 0:
-                    g2.drawImage(actionButtonImages[1], xOfButton, yOfButton, subImageWidthActions,
-                            subImageHeightActions,
-                            null);
-                    g2.drawImage(actionButtonImages[2], xOfButton * 2 + subImageWidthActions, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[4], xOfButton * 3 + subImageWidthActions * 2, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[6], xOfButton * 4 + subImageWidthActions * 3, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    break;
-                case 1:
-                    g2.drawImage(actionButtonImages[0], xOfButton, yOfButton, subImageWidthActions,
-                            subImageHeightActions,
-                            null);
-                    g2.drawImage(actionButtonImages[3], xOfButton * 2 + subImageWidthActions, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[4], xOfButton * 3 + subImageWidthActions * 2, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[6], xOfButton * 4 + subImageWidthActions * 3, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    break;
-                case 2:
-                    g2.drawImage(actionButtonImages[0], xOfButton, yOfButton, subImageWidthActions,
-                            subImageHeightActions,
-                            null);
-                    g2.drawImage(actionButtonImages[2], xOfButton * 2 + subImageWidthActions, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[5], xOfButton * 3 + subImageWidthActions * 2, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[6], xOfButton * 4 + subImageWidthActions * 3, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    break;
-                case 3:
-                    g2.drawImage(actionButtonImages[0], xOfButton, yOfButton, subImageWidthActions,
-                            subImageHeightActions,
-                            null);
-                    g2.drawImage(actionButtonImages[2], xOfButton * 2 + subImageWidthActions, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[4], xOfButton * 3 + subImageWidthActions * 2, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    g2.drawImage(actionButtonImages[7], xOfButton * 4 + subImageWidthActions * 3, yOfButton,
-                            subImageWidthActions,
-                            subImageHeightActions, null);
-                    break;
-                default:
-                    break;
-            }
-            // Heart
-            g2.drawImage(heart, heartLocationX, yOfButton + 13, 16, 16, null);
+        // Heart health bar
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
+        g2.drawString("HP: " + getPlayerHealth(), gp.getScreenWidth() / 2 - 7 * 19,
+                gp.getScreenHeight() - gp.getScreenHeight() / 5 + 15);
+        g2.setColor(Color.RED);
+        g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - 50, 100, 15);
+        g2.setColor(Color.GREEN);
+        g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - 50,
+                getPlayerHealth(), 15);
 
-            // Heart health bar
-            g2.setColor(Color.WHITE);
-            g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
-            g2.drawString("HP: " + getPlayerHealth(), gp.getScreenWidth() / 2 - 7 * 19,
-                    gp.getScreenHeight() - gp.getScreenHeight() / 5 + 15);
-            g2.setColor(Color.RED);
-            g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5, 100, 15);
-            g2.setColor(Color.GREEN);
-            g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5,
-                    getPlayerHealth(), 15);
-
-            for (Projectile projectile : tempProjectiles) {
-                projectile.draw(g2);
-            }
+        for (Projectile projectile : tempProjectiles) {
+            projectile.draw(g2);
         }
     }
 }

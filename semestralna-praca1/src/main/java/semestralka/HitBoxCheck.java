@@ -40,6 +40,9 @@ public class HitBoxCheck {
                     } else {
                         player.setCollisionDetected(true);
                     }
+                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
+                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
+                    player.setEncounter(true);
                 }
                 break;
             case "down":
@@ -49,6 +52,9 @@ public class HitBoxCheck {
                 if (gp.getTileManager().getTile(tileId1).isCollision()
                         || gp.getTileManager().getTile(tileId2).isCollision()) {
                     player.setCollisionDetected(true);
+                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
+                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
+                    player.setEncounter(true);
                 }
                 break;
             case "left":
@@ -58,6 +64,9 @@ public class HitBoxCheck {
                 if (gp.getTileManager().getTile(tileId1).isCollision()
                         || gp.getTileManager().getTile(tileId2).isCollision()) {
                     player.setCollisionDetected(true);
+                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
+                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
+                    player.setEncounter(true);
                 }
                 break;
             case "right":
@@ -67,6 +76,9 @@ public class HitBoxCheck {
                 if (gp.getTileManager().getTile(tileId1).isCollision()
                         || gp.getTileManager().getTile(tileId2).isCollision()) {
                     player.setCollisionDetected(true);
+                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
+                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
+                    player.setEncounter(true);
                 }
                 break;
             default:

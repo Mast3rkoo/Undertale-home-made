@@ -15,8 +15,9 @@ public class TileManager {
     private GamePanel gp;
     private Tile[] tile;
     private int[][] mapTileNumber;
-    private int tileArrayLenght = 79; // Set the correct tile array length
+    private int tileArrayLenght = 83; // Set the correct tile array length
     private String[] tileArrayPaths;
+    private int[] encounterTiles = { 2, 3, 4, 5, 6, 7, 79, 80, 81, 82 };
 
     public TileManager(GamePanel gp) {
         this.gp = gp;
@@ -28,6 +29,11 @@ public class TileManager {
         prepareTilePaths(); // Load all tile paths into the array
         initializeTiles(); // Initialize the Tile array
         getTileImage(); // Load tile images
+
+        for (int encounterTile : encounterTiles) {
+            tile[encounterTile].setEncounter(true);
+        }
+
         loadMap("/res/maps/map001.txt"); // Load the map file
     }
 
@@ -37,7 +43,9 @@ public class TileManager {
         // Room 1 textury
         tileArrayPaths[0] = "/res/tiles/room1/Black-background.png";
         tileArrayPaths[1] = "/res/tiles/room1/Dark-gray-back.png";
-        tileArrayPaths[2] = "/res/tiles/room1/Introduction-ground-middle.png";
+
+        // Specialne tiles ktore vyvolavaju enemakov
+        tileArrayPaths[2] = "/res/tiles/room1/Dark-gray-back.png";
         tileArrayPaths[3] = "/res/tiles/room1/Introduction-ground-middle.png";
         tileArrayPaths[4] = "/res/tiles/room1/Introduction-ground-middle.png";
         tileArrayPaths[5] = "/res/tiles/room1/Introduction-ground-middle.png";
@@ -120,6 +128,13 @@ public class TileManager {
         tileArrayPaths[76] = "/res/tiles/room2/row-3-column-8.png";
         tileArrayPaths[77] = "/res/tiles/room2/row-3-column-9.png";
         tileArrayPaths[78] = "/res/tiles/room2/row-3-column-10.png";
+
+        // Dummy textura
+        tileArrayPaths[79] = "/res/enemy/dummy/row-1-column-1.png";
+        tileArrayPaths[80] = "/res/enemy/dummy/row-1-column-2.png";
+        tileArrayPaths[81] = "/res/enemy/dummy/row-2-column-1.png";
+        tileArrayPaths[82] = "/res/enemy/dummy/row-2-column-2.png";
+
     }
 
     private void initializeTiles() {
@@ -134,6 +149,11 @@ public class TileManager {
 
     public int getMapTileNumber(int column, int row) {
         return mapTileNumber[column][row];
+    }
+
+    public void resetEncounterTile(int tileNumber) {
+        System.out.println("Resetting encounter tile " + tileNumber);
+        tile[tileNumber].setEncounter(false);
     }
 
     public void getTileImage() {
@@ -191,10 +211,12 @@ public class TileManager {
     public void draw(Graphics2D g2) {
         int worldColumn = 0;
         int worldRow = 0;
-        tile[0].setCollision(true);
-        tile[17].setCollision(true);
-        tile[18].setCollision(true);
-        tile[19].setCollision(true);
+
+        int[] collisionTiles = { 0, 17, 18, 19, 50, 51, 52, 53, 58, 59, 60, 61, 65 };
+
+        for (int collisionTile : collisionTiles) {
+            tile[collisionTile].setCollision(true);
+        }
 
         while (worldColumn < gp.getMaxWorldColumn() && worldRow < gp.getMaxWorldRow()) {
 
@@ -211,7 +233,6 @@ public class TileManager {
                     worldY - gp.getTileSize() < gp.getPlayer().getWorldY() + gp.getPlayer().getScreenY()) {
 
                 g2.drawImage(tile[tileNumber].getImage(), screenX, screenY, gp.getTileSize(), gp.getTileSize(), null);
-
             }
             worldColumn++;
 
@@ -219,6 +240,7 @@ public class TileManager {
                 worldColumn = 0;
                 worldRow++;
             }
+
         }
 
     }

@@ -25,6 +25,7 @@ public class Projectile extends Battle {
     private int bulletDamage;
     private Random random;
     private String whichSide;
+    private int sizeOfBullet;
 
     public Projectile(GamePanel gp, PlayerHeart playerHeart) {
         super(gp);
@@ -35,6 +36,7 @@ public class Projectile extends Battle {
         bulletActive = true;
         bulletSpeed = 0;
         bulletDamage = 0;
+        sizeOfBullet = getHeightOfBattleRect() / 40;
         random = new Random();
     }
 
@@ -50,37 +52,37 @@ public class Projectile extends Battle {
         this.fightMenu = fightMenu;
         this.whichSide = whichSide;
 
-        int tempWidthOfBattleRect = (gp.getScreenWidth() - 80) / 2;
+        int tempWidthOfBattleRect = gp.getScreenWidth() / 3;
         int tempxOfBattleRect = (gp.getScreenWidth() - tempWidthOfBattleRect) / 2;
-        int tempyOfBattleRect = gp.getTileSize() * 5;
-        int tempHeightOfBattleRect = 170;
+        int tempyOfBattleRect = gp.getScreenHeight() / 3;
+        int tempHeightOfBattleRect = 270;
 
         // Choosing random starting position of bullet based on width of rectangle
         if (whichSide.equals("top")) {
-            int minX = tempxOfBattleRect + bullet.getWidth();
-            int maxX = tempxOfBattleRect + tempWidthOfBattleRect - bullet.getWidth();
+            int minX = tempxOfBattleRect + sizeOfBullet;
+            int maxX = tempxOfBattleRect + tempWidthOfBattleRect - sizeOfBullet;
             xOfBullet = (int) (Math.random() * (maxX - minX)) + minX;
             yOfBullet = tempyOfBattleRect + bullet.getHeight();
         }
 
         else if (whichSide.equals("bottom")) {
             int minX = tempxOfBattleRect + bullet.getWidth();
-            int maxX = tempxOfBattleRect + tempWidthOfBattleRect - bullet.getWidth();
+            int maxX = tempxOfBattleRect + tempWidthOfBattleRect - sizeOfBullet;
             xOfBullet = (int) (Math.random() * (maxX - minX)) + minX;
-            yOfBullet = tempyOfBattleRect + tempHeightOfBattleRect - bullet.getHeight();
+            yOfBullet = tempyOfBattleRect + tempHeightOfBattleRect - sizeOfBullet;
         }
 
         else if (whichSide.equals("left")) {
-            int minY = tempyOfBattleRect + bullet.getHeight();
-            int maxY = tempyOfBattleRect + tempHeightOfBattleRect - bullet.getHeight();
-            xOfBullet = tempxOfBattleRect + bullet.getWidth();
+            int minY = tempyOfBattleRect + sizeOfBullet;
+            int maxY = tempyOfBattleRect + tempHeightOfBattleRect - sizeOfBullet;
+            xOfBullet = tempxOfBattleRect + sizeOfBullet;
             yOfBullet = (int) (Math.random() * (maxY - minY)) + minY;
         }
 
         else if (whichSide.equals("right")) {
-            int minY = tempyOfBattleRect + bullet.getHeight();
-            int maxY = tempyOfBattleRect + tempHeightOfBattleRect + bullet.getHeight();
-            xOfBullet = tempxOfBattleRect + tempWidthOfBattleRect - bullet.getWidth() * 2;
+            int minY = tempyOfBattleRect + sizeOfBullet;
+            int maxY = tempyOfBattleRect + tempHeightOfBattleRect + sizeOfBullet;
+            xOfBullet = tempxOfBattleRect + tempWidthOfBattleRect - sizeOfBullet * 2;
             yOfBullet = (int) (Math.random() * (maxY - minY)) + minY;
         }
 
@@ -88,7 +90,8 @@ public class Projectile extends Battle {
             System.out.println("Error in setting bullet position");
         }
 
-        bulletHitBox = new Rectangle(xOfBullet + bullet.getWidth(), yOfBullet, 5, 5);
+        bulletHitBox = new Rectangle(xOfBullet + bullet.getWidth(), yOfBullet, sizeOfBullet,
+                sizeOfBullet);
     }
 
     public void checkBulletCollision() {
@@ -105,12 +108,10 @@ public class Projectile extends Battle {
         // Left side
         int bulletLeftX = bulletHitBox.x;
         int rectLeftX = battleRectHitbox.x;
-        System.out.println("Left " + rectLeftX);
 
         // Right side
         int bulletRightX = bulletHitBox.x + bulletHitBox.width;
         int rectRightX = battleRectHitbox.x + battleRectHitbox.width;
-        System.out.println("Right " + rectRightX);
 
         // Check if the bullet overlaps with the heart on the X-axis
         boolean isXOverlap = (bulletRightX > playerHeart.getWorldHeart("leftX")

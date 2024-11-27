@@ -17,19 +17,18 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Screen dimensions
     private final int originalTileSize = 20;
-    private final int scale = 2;
+    private final int scale = 3;
 
     private final int tileSize = originalTileSize * scale;
     // private final int maxScreenCol = 80;
     // private final int maxScreenRow = 20;
-    private final int screenWidth = tileSize * 16;
-    private final int screenHeight = tileSize * 12;
+    private final int screenWidth = 1280; // 1280px width
+    private final int screenHeight = 720; // 720px height
 
     // WORLD SETTINGS
-    private final int maxWorldColumn = 26;
-    private final int maxWorldRow = 12;
-    // private final int worldWidth = tileSize * 16;
-    // private final int worldHeight = tileSize * 12;
+    private final int maxWorldColumn = 32; // 32 tiles
+    private final int maxWorldRow = 18; // 18 tiles
+
     private double delta;
 
     private KeyHandler keyH = new KeyHandler();
@@ -132,12 +131,20 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    public void resetEncounterTile(int tile) {
+        tileManager.resetEncounterTile(tile);
+    }
+
+    public void drawEncounter(boolean fightMenu) {
+        changeFightMenu(fightMenu);
+        paintComponent(this.getGraphics());
+    }
+
     public void updateGame() {
         long currentTime = System.currentTimeMillis();
         if (!battle.getFightMenu()) {
             player.update();
             if (currentTime - lastLogTime >= 1000) {
-                System.out.println("Player is moving");
                 lastLogTime = currentTime;
             }
         } else {
@@ -146,7 +153,6 @@ public class GamePanel extends JPanel implements Runnable {
                 playerHeart.update();
             }
             if (currentTime - lastLogTime >= 1000) {
-                System.out.println("Fight menu is open");
                 lastLogTime = currentTime;
             }
         }
@@ -159,11 +165,13 @@ public class GamePanel extends JPanel implements Runnable {
         if (!battle.getFightMenu()) {
             tileManager.draw(g2);
             player.draw(g2);
-        } else {
+        } else if (battle.getFightMenu()) {
             fightMenu.drawFightMenu(g2);
             if (fightMenu.getNumberOfTurn() == 1) {
                 playerHeart.draw(g2);
             }
+        } else {
+            System.out.println("Error in paintComponent");
         }
         g2.dispose();
     }

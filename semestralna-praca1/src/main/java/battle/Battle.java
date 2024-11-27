@@ -1,11 +1,14 @@
 package battle;
 
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
 
 import semestralka.GamePanel;
 
 public class Battle {
-    private boolean fightMenu = true;
+    private boolean fightMenu = false;
 
     // Players heart attributes
     private int worldXHeart, worldYHeart;
@@ -21,14 +24,45 @@ public class Battle {
 
     private Rectangle battleRectHitbox;
 
+    private BufferedImage[] enemyImages = new BufferedImage[4];
+
     public Battle(GamePanel gp) {
         xOfBattleRect = gp.getScreenWidth() / 10;
-        yOfBattleRect = gp.getTileSize() * 5;
+        yOfBattleRect = gp.getScreenHeight() / 3;
 
         widthOfBattleRect = gp.getScreenWidth() - 80;
-        heightOfBattleRect = 170;
+        heightOfBattleRect = 270;
 
         battleRectHitbox = new Rectangle(xOfBattleRect, yOfBattleRect, widthOfBattleRect, heightOfBattleRect);
+    }
+
+    public BufferedImage[] splitEnemyImages(BufferedImage image, int imageCount) {
+        int subImageWidth = image.getWidth() / 2;
+        int subImageHeight = image.getHeight() / (imageCount / 2);
+
+        int index = 0;
+        for (int row = 0; row < imageCount / 2; row++) {
+            for (int col = 0; col < 2; col++) {
+                enemyImages[index] = image.getSubimage(
+                        col * subImageWidth,
+                        row * subImageHeight,
+                        subImageWidth,
+                        subImageHeight);
+                index++;
+            }
+        }
+        return enemyImages;
+    }
+
+    public BufferedImage[] getFloweyImages() {
+        BufferedImage flowey = null;
+        try {
+            flowey = ImageIO.read(getClass().getResourceAsStream("/res/enemy/flowey.png"));
+            return splitEnemyImages(flowey, 4);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public int getWidthOfBattleRect() {
@@ -49,10 +83,6 @@ public class Battle {
 
     public void setWidthOfBattleRect(int widthOfBattleRect) {
         this.widthOfBattleRect = widthOfBattleRect;
-    }
-
-    public void setHeightOfBattleRect(int heightOfBattleRect) {
-        this.heightOfBattleRect = heightOfBattleRect;
     }
 
     public void setXOfBattleRect(int xOfBattleRect) {
@@ -136,7 +166,7 @@ public class Battle {
     }
 
     public Rectangle getBattleRectHitbox() {
-        this.battleRectHitbox = new Rectangle(xOfBattleRect, yOfBattleRect, widthOfBattleRect, 170);
+        this.battleRectHitbox = new Rectangle(xOfBattleRect, yOfBattleRect, widthOfBattleRect, heightOfBattleRect);
         return this.battleRectHitbox;
     }
 }
