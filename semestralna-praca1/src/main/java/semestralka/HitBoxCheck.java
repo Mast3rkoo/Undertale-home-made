@@ -42,7 +42,9 @@ public class HitBoxCheck {
                     }
                 } else if (gp.getTileManager().getTile(tileId1).isEncounter()
                         || gp.getTileManager().getTile(tileId2).isEncounter()) {
-                    player.setEncounter(true);
+
+                    gp.getFightMenu().setEnemy("flowey");
+                    gp.getFightMenu().setEncounter(true);
                 }
                 break;
             case "down":
@@ -54,7 +56,9 @@ public class HitBoxCheck {
                     player.setCollisionDetected(true);
                 } else if (gp.getTileManager().getTile(tileId1).isEncounter()
                         || gp.getTileManager().getTile(tileId2).isEncounter()) {
-                    player.setEncounter(true);
+
+                    gp.getFightMenu().setEnemy("flowey");
+                    gp.getFightMenu().setEncounter(true);
                 }
                 break;
             case "left":
@@ -66,7 +70,9 @@ public class HitBoxCheck {
                     player.setCollisionDetected(true);
                 } else if (gp.getTileManager().getTile(tileId1).isEncounter()
                         || gp.getTileManager().getTile(tileId2).isEncounter()) {
-                    player.setEncounter(true);
+
+                    gp.getFightMenu().setEnemy("flowey");
+                    gp.getFightMenu().setEncounter(true);
                 }
                 break;
             case "right":
@@ -78,7 +84,9 @@ public class HitBoxCheck {
                     player.setCollisionDetected(true);
                 } else if (gp.getTileManager().getTile(tileId1).isEncounter()
                         || gp.getTileManager().getTile(tileId2).isEncounter()) {
-                    player.setEncounter(true);
+
+                    gp.getFightMenu().setEnemy("flowey");
+                    gp.getFightMenu().setEncounter(true);
                 }
                 break;
             default:

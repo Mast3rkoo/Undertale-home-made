@@ -87,6 +87,10 @@ public class GamePanel extends JPanel implements Runnable {
         return tileManager;
     }
 
+    public FightMenu getFightMenu() {
+        return fightMenu;
+    }
+
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();

@@ -22,8 +22,7 @@ public class FightMenu extends Battle {
     private KeyHandler keyH;
     private Projectile projectile;
     private PlayerHeart playerHeart;
-    private BufferedImage heart;
-    private BufferedImage actionButtons;
+    private BufferedImage heart, dialogBox, actionButtons;
     private BufferedImage[] enemyImages = new BufferedImage[4];
     private BufferedImage[] actionButtonImages = new BufferedImage[8];
     private int subImageWidthActions;
@@ -40,6 +39,9 @@ public class FightMenu extends Battle {
     private int buttonImageWidth, buttonImageHeight;
     private int gapBetweenButtons;
     private int heartLocationX, heartLocationY;
+    private String[] enemyDialogue;
+    private int numberOfDialogueBox;
+    private int numberOfDialogueEnemy;
 
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         super(gp);
@@ -48,9 +50,9 @@ public class FightMenu extends Battle {
         this.playerHeart = playerHeart;
 
         random = new Random();
-        hpOfEnemy = 100;
         numberOfSprite = 0;
-        battleMessage = "Flowey wants to fight!";
+        numberOfDialogueBox = 0;
+        numberOfDialogueEnemy = 0;
 
         xOfButton = gp.getScreenWidth() / 5;
         yOfButton = gp.getScreenHeight() - gp.getScreenHeight() / 7;
@@ -71,7 +73,7 @@ public class FightMenu extends Battle {
         try {
             actionButtons = ImageIO.read(getClass().getResourceAsStream("/res/fightMenu/action-choices.png"));
             heart = ImageIO.read(getClass().getResourceAsStream("/res/fightMenu/heart.png"));
-            enemyImages = getFloweyImages();
+            dialogBox = ImageIO.read(getClass().getResourceAsStream("/res/fightMenu/dialogBox.png"));
         } catch (IOException i) {
             i.printStackTrace();
         }
@@ -94,6 +96,14 @@ public class FightMenu extends Battle {
                         subImageHeightActions);
                 index++;
             }
+        }
+    }
+
+    public void setEnemy(String enemy) {
+        if (enemy.equals("flowey")) {
+            enemyImages = getFloweyAttributes();
+            hpOfEnemy = getEnemyHp();
+            enemyDialogue = getEnemyDialogue();
         }
     }
 
@@ -121,7 +131,7 @@ public class FightMenu extends Battle {
                 break;
         }
         while (numberOfProjectiles > 0) {
-            makeProjectile(4, random.nextInt(10) + 10, side);
+            makeProjectile(4, random.nextInt(10) + getEnemyDamage(), side);
             numberOfProjectiles--;
         }
         tempProjectiles = new ArrayList<>(projectiles);
@@ -135,8 +145,12 @@ public class FightMenu extends Battle {
         setNumberOfTurn(numberOfTurn);
     }
 
-    public void update() {
+    public void setEncounter(boolean fightMenu) {
+        System.out.println("Setting fight menu to " + fightMenu);
+        gp.drawEncounter(fightMenu);
+    }
 
+    public void update() {
         int numberOfTurn = getNumberOfTurn();
         // Action choices movement
         if (hpOfEnemy <= 0 || getPlayerHealth() <= 0) {
@@ -161,20 +175,27 @@ public class FightMenu extends Battle {
                 numberOfSprite = 3;
                 hpOfEnemy -= random.nextInt(21) + 10;
                 keyH.setEnterPressed(false);
+                numberOfDialogueEnemy = 2;
                 // Changes sprite to make it look like it hurt the enemy and then changes it
                 // back to 0 meaning the normal state after 1 second
-                Timer timer = new Timer(1500, _ -> {
+                Timer timer = new Timer(2500, _ -> {
                     numberOfSprite = 0; // Reset sprite to 0
                     gp.repaint();
                 });
+                numberOfDialogueBox = 1;
+                enemyAttack();
                 timer.setRepeats(false);
                 timer.start();
-                enemyAttack();
             } else if (keyH.isEnterPressed() && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 System.out.println("You chose to act on the enemy");
             } else if (keyH.isEnterPressed() && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 if (getPlayerHealth() < 100) {
-                    setPlayerHealth(getPlayerHealth() + random.nextInt(21) + 10);
+                    int healedAmount = random.nextInt(21) + 10;
+                    if (getPlayerHealth() + healedAmount > 100) {
+                        setPlayerHealth(100);
+                    } else {
+                        setPlayerHealth(getPlayerHealth() + healedAmount);
+                    }
                 }
                 keyH.setEnterPressed(false);
                 enemyAttack();
@@ -238,14 +259,30 @@ public class FightMenu extends Battle {
         // Rectangle battleRect = getBattleRectHitbox();
         // g2.setColor(Color.green);
         // g2.drawRect(battleRect.x, battleRect.y, battleRect.width, battleRect.height);
-        g2.setColor(Color.WHITE);
+
+        g2.setFont(new Font("TimesRoman", Font.BOLD, 25));
+        if (getNumberOfTurn() == 1) {
+            g2.drawImage(dialogBox, (gp.getScreenWidth()) / 2 + enemyImages[0].getWidth() * 2, gp.getTileSize(),
+                    dialogBox.getWidth() * 2 - 50,
+                    dialogBox.getHeight() * 2 - 50, null);
+            g2.setColor(Color.BLACK);
+            g2.drawString(enemyDialogue[numberOfDialogueEnemy],
+                    (gp.getScreenWidth()) / 2 + enemyImages[0].getWidth() * 2 + 60,
+                    gp.getTileSize() + 40);
+            g2.drawString(enemyDialogue[numberOfDialogueEnemy + 1],
+                    (gp.getScreenWidth()) / 2 + enemyImages[0].getWidth() * 2 + 60,
+                    gp.getTileSize() + 40 * 2);
+
+        } else {
+            g2.setColor(Color.WHITE);
+            g2.drawString(enemyDialogue[numberOfDialogueBox], xOfBattleRect + battleMessage.length(),
+                    gp.getScreenHeight() / 3 + battleMessage.length() * 2);
+        }
+
         g2.setStroke(new BasicStroke(3));
+        g2.setColor(Color.WHITE);
         g2.drawRect(xOfBattleRect, gp.getScreenHeight() / 3, widthOfBattleRect,
                 getHeightOfBattleRect());
-
-        g2.setFont(new Font("TimesRoman", Font.PLAIN, 25));
-        g2.drawString(battleMessage, xOfBattleRect + battleMessage.length(),
-                gp.getScreenHeight() / 3 + battleMessage.length() * 2);
 
         // Enemy
         g2.drawImage(enemyImages[numberOfSprite],
@@ -255,14 +292,18 @@ public class FightMenu extends Battle {
                 enemyImages[0].getHeight() * 3, null);
         // Enemy health bar
         g2.setColor(Color.RED);
-        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10, gp.getScreenHeight() / 4, 100,
+        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10,
+                gp.getScreenHeight() / 5 + enemyImages[0].getHeight(), 100,
                 15);
         g2.setColor(Color.GREEN);
-        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10, gp.getScreenHeight() / 4,
+        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10,
+                gp.getScreenHeight() / 5 + enemyImages[0].getHeight(),
                 hpOfEnemy,
                 15);
 
+        // Action choices
         switch (positionOfHeart) {
+
             case 0:
                 g2.drawImage(actionButtonImages[1], xOfButton, yOfButton, buttonImageWidth,
                         buttonImageHeight,
@@ -342,6 +383,7 @@ public class FightMenu extends Battle {
             default:
                 break;
         }
+
         // Heart
         g2.drawImage(heart, heartLocationX, heartLocationY, 26, 26, null);
 
@@ -351,9 +393,9 @@ public class FightMenu extends Battle {
         g2.drawString("HP: " + getPlayerHealth(), gp.getScreenWidth() / 2 - 7 * 19,
                 gp.getScreenHeight() - gp.getScreenHeight() / 5 + 15);
         g2.setColor(Color.RED);
-        g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - 50, 100, 15);
+        g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5, 100, 15);
         g2.setColor(Color.GREEN);
-        g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - 50,
+        g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5,
                 getPlayerHealth(), 15);
 
         for (Projectile projectile : tempProjectiles) {

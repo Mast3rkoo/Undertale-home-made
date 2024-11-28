@@ -56,11 +56,6 @@ public class Player extends Entity {
         this.tileManager = tileManager;
     }
 
-    public void setEncounter(boolean fightMenu) {
-        System.out.println("Setting fight menu to " + fightMenu);
-        gp.drawEncounter(fightMenu);
-    }
-
     public void getPlayerImage() {
         try {
             up1 = ImageIO.read(getClass().getResourceAsStream("/res/player/Tesa_back_idle.png"));

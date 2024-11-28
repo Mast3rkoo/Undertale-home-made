@@ -25,6 +25,23 @@ public class Battle {
     private Rectangle battleRectHitbox;
 
     private BufferedImage[] enemyImages = new BufferedImage[4];
+    private int enemyHp;
+    private int enemyDamage;
+    private String[] enemyDialogue;
+    private String[] floweyDialogue = {
+            "You've encountered Flowey!", // Encounter
+            "You attacked Flowey!", // Attack action
+            "Trying to attack me with that?",
+            "How pathetic!", // Attack action
+            "You beg Flowey to stop.",
+            "Stop? We're just getting started!", // Begging
+            "You check Flowey's stats. HP: 100, Damage: 10", // Checking stats
+            "You used an item.", // Using an item
+            "Healing? How cute!", // Using an item
+            "You tried to run, but Flowey blocks your path with his vines!", // Trying to run
+            "You're not going anywhere!", // Trying to run
+            "You won!" // Winning
+    };
 
     public Battle(GamePanel gp) {
         xOfBattleRect = gp.getScreenWidth() / 10;
@@ -54,7 +71,14 @@ public class Battle {
         return enemyImages;
     }
 
-    public BufferedImage[] getFloweyImages() {
+    public BufferedImage[] getFloweyAttributes() {
+        this.enemyHp = 100;
+        this.enemyDamage = 10;
+        this.enemyDialogue = floweyDialogue;
+        return getFloweyImages();
+    }
+
+    private BufferedImage[] getFloweyImages() {
         BufferedImage flowey = null;
         try {
             flowey = ImageIO.read(getClass().getResourceAsStream("/res/enemy/flowey.png"));
@@ -63,6 +87,18 @@ public class Battle {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public int getEnemyHp() {
+        return this.enemyHp;
+    }
+
+    public int getEnemyDamage() {
+        return this.enemyDamage;
+    }
+
+    public String[] getEnemyDialogue() {
+        return this.enemyDialogue;
     }
 
     public int getWidthOfBattleRect() {
