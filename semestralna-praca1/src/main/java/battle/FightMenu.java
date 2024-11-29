@@ -42,6 +42,10 @@ public class FightMenu extends Battle {
     private String[] enemyDialogue;
     private int numberOfDialogueBox;
     private int numberOfDialogueEnemy;
+    private boolean actOptionsOpen;
+    private String[] actOptions;
+    private int actOptionChoosen;
+    private int yOfHeartAct;
 
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         super(gp);
@@ -53,6 +57,7 @@ public class FightMenu extends Battle {
         numberOfSprite = 0;
         numberOfDialogueBox = 0;
         numberOfDialogueEnemy = 0;
+        actOptionChoosen = 0;
 
         xOfButton = gp.getScreenWidth() / 5;
         yOfButton = gp.getScreenHeight() - gp.getScreenHeight() / 7;
@@ -104,6 +109,7 @@ public class FightMenu extends Battle {
             enemyImages = getFloweyAttributes();
             hpOfEnemy = getEnemyHp();
             enemyDialogue = getEnemyDialogue();
+            actOptions = getActOptions();
         }
     }
 
@@ -187,7 +193,28 @@ public class FightMenu extends Battle {
                 timer.setRepeats(false);
                 timer.start();
             } else if (keyH.isEnterPressed() && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 0) {
-                System.out.println("You chose to act on the enemy");
+                actOptionsOpen = true;
+                int actHeartPosition = 0;
+                if (keyH.isDownPressed() && actHeartPosition == 0) {
+                    yOfHeartAct += 20;
+                    actHeartPosition++;
+                    keyH.setDownPressed(false);
+                } else if (keyH.isUpPressed() && actHeartPosition == 1) {
+                    yOfHeartAct -= 20;
+                    actHeartPosition--;
+                    keyH.setUpPressed(false);
+                }
+                switch (actOptionChoosen) {
+                    case 1:
+                        numberOfDialogueBox = 4;
+                        numberOfDialogueEnemy = 5;
+                        break;
+
+                    default:
+                        numberOfDialogueEnemy = 12;
+                        numberOfDialogueBox = 6;
+                        break;
+                }
             } else if (keyH.isEnterPressed() && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0) {
                 if (getPlayerHealth() < 100) {
                     int healedAmount = random.nextInt(21) + 10;
@@ -196,6 +223,8 @@ public class FightMenu extends Battle {
                     } else {
                         setPlayerHealth(getPlayerHealth() + healedAmount);
                     }
+                    numberOfDialogueBox = 7;
+                    numberOfDialogueEnemy = 8;
                 }
                 keyH.setEnterPressed(false);
                 enemyAttack();
@@ -207,6 +236,8 @@ public class FightMenu extends Battle {
                     gp.changeFightMenu(false);
                     return;
                 } else {
+                    numberOfDialogueBox = 9;
+                    numberOfDialogueEnemy = 10;
                     enemyAttack();
                 }
                 keyH.setEnterPressed(false);
@@ -277,6 +308,25 @@ public class FightMenu extends Battle {
             g2.setColor(Color.WHITE);
             g2.drawString(enemyDialogue[numberOfDialogueBox], xOfBattleRect + battleMessage.length(),
                     gp.getScreenHeight() / 3 + battleMessage.length() * 2);
+        }
+
+        if (actOptionsOpen) {
+            numberOfDialogueBox = 13;
+
+            int xOfChoice = xOfBattleRect + 20;
+            int yOfChoice = gp.getScreenHeight() / 3 + 50;
+
+            yOfHeartAct += yOfChoice - 20;
+
+            // Choice picker
+            g2.drawImage(heart, xOfChoice - 5, yOfHeartAct, 20, 20, null);
+
+            // Choices
+            g2.setColor(Color.WHITE);
+            g2.drawString(actOptions[0], xOfChoice + 20,
+                    yOfChoice);
+            g2.drawString(actOptions[1], xOfChoice + 20,
+                    yOfChoice + gp.getScreenHeight() / 12);
         }
 
         g2.setStroke(new BasicStroke(3));
@@ -384,8 +434,10 @@ public class FightMenu extends Battle {
                 break;
         }
 
-        // Heart
-        g2.drawImage(heart, heartLocationX, heartLocationY, 26, 26, null);
+        if (!actOptionsOpen) {
+            // Heart
+            g2.drawImage(heart, heartLocationX, heartLocationY, 26, 26, null);
+        }
 
         // Heart health bar
         g2.setColor(Color.WHITE);

@@ -39,6 +39,14 @@ public class KeyHandler implements KeyListener {
         this.rightPressed = rightPressed;
     }
 
+    public void setDownPressed(boolean downPressed) {
+        this.downPressed = downPressed;
+    }
+
+    public void setUpPressed(boolean upPressed) {
+        this.upPressed = upPressed;
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
@@ -86,9 +94,6 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_D) {
             rightPressed = false;
 
-        }
-        if (code == KeyEvent.VK_ENTER) {
-            enterPressed = false;
         }
 
     }

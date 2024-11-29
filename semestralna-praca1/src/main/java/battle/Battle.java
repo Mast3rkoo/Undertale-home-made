@@ -28,6 +28,7 @@ public class Battle {
     private int enemyHp;
     private int enemyDamage;
     private String[] enemyDialogue;
+    private String[] actOptions;
     private String[] floweyDialogue = {
             "You've encountered Flowey!", // Encounter
             "You attacked Flowey!", // Attack action
@@ -40,8 +41,11 @@ public class Battle {
             "Healing? How cute!", // Using an item
             "You tried to run, but Flowey blocks your path with his vines!", // Trying to run
             "You're not going anywhere!", // Trying to run
-            "You won!" // Winning
+            "You won!", // Winning
+            "Yes I am that strong!", // Checking stats
+            "" // Clear dialogue - 13
     };
+    private String[] floweyActOptions = { "Check", "Beg" };
 
     public Battle(GamePanel gp) {
         xOfBattleRect = gp.getScreenWidth() / 10;
@@ -75,6 +79,7 @@ public class Battle {
         this.enemyHp = 100;
         this.enemyDamage = 10;
         this.enemyDialogue = floweyDialogue;
+        this.actOptions = floweyActOptions;
         return getFloweyImages();
     }
 
@@ -87,6 +92,10 @@ public class Battle {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String[] getActOptions() {
+        return this.actOptions;
     }
 
     public int getEnemyHp() {
