@@ -32,7 +32,7 @@ public class Battle {
     private String[] floweyDialogue = {
             "You've encountered Flowey!", // Encounter
             "You attacked Flowey!", // Attack action
-            "Trying to attack me with that?, How pathetic!",
+            "Trying to attack? How pathetic!", // Attack action
             "You beg Flowey to stop.",
             "Stop? We're just getting started!", // Begging
             "You check Flowey's stats. HP: 100, Damage: 10", // Checking stats
