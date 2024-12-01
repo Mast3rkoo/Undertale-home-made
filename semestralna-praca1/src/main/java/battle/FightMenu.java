@@ -45,7 +45,9 @@ public class FightMenu extends Battle {
     private boolean actOptionsOpen;
     private String[] actOptions;
     private int actOptionChoosen;
+    private int actHeartPosition;
     private int yOfHeartAct;
+    private boolean isChoicePicked;
 
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         super(gp);
@@ -58,6 +60,9 @@ public class FightMenu extends Battle {
         numberOfDialogueBox = 0;
         numberOfDialogueEnemy = 0;
         actOptionChoosen = 0;
+        isChoicePicked = false;
+        actHeartPosition = 0;
+        yOfHeartAct = gp.getScreenHeight() / 3 + 30;
 
         xOfButton = gp.getScreenWidth() / 5;
         yOfButton = gp.getScreenHeight() - gp.getScreenHeight() / 7;
@@ -176,7 +181,8 @@ public class FightMenu extends Battle {
                 positionOfHeart--;
                 keyH.setLeftPressed(false);
             }
-            if (keyH.isEnterPressed() && positionOfHeart == 0 && hpOfEnemy > 0 && numberOfTurn == 0) {
+            if (keyH.isEnterPressed() && positionOfHeart == 0 && hpOfEnemy > 0 && numberOfTurn == 0
+                    && !isChoicePicked) {
                 // Attack logic
                 numberOfSprite = 3;
                 hpOfEnemy -= random.nextInt(21) + 10;
@@ -189,33 +195,17 @@ public class FightMenu extends Battle {
                     gp.repaint();
                 });
                 numberOfDialogueBox = 1;
+                isChoicePicked = true;
                 enemyAttack();
                 timer.setRepeats(false);
                 timer.start();
-            } else if (keyH.isEnterPressed() && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 0) {
+            } else if (keyH.isEnterPressed() && positionOfHeart == 1 && hpOfEnemy > 0 && numberOfTurn == 0
+                    && !isChoicePicked) {
+                isChoicePicked = true;
                 actOptionsOpen = true;
-                int actHeartPosition = 0;
-                if (keyH.isDownPressed() && actHeartPosition == 0) {
-                    yOfHeartAct += 20;
-                    actHeartPosition++;
-                    keyH.setDownPressed(false);
-                } else if (keyH.isUpPressed() && actHeartPosition == 1) {
-                    yOfHeartAct -= 20;
-                    actHeartPosition--;
-                    keyH.setUpPressed(false);
-                }
-                switch (actOptionChoosen) {
-                    case 1:
-                        numberOfDialogueBox = 4;
-                        numberOfDialogueEnemy = 5;
-                        break;
-
-                    default:
-                        numberOfDialogueEnemy = 12;
-                        numberOfDialogueBox = 6;
-                        break;
-                }
-            } else if (keyH.isEnterPressed() && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0) {
+                keyH.setEnterPressed(false);
+            } else if (keyH.isEnterPressed() && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0
+                    && !isChoicePicked) {
                 if (getPlayerHealth() < 100) {
                     int healedAmount = random.nextInt(21) + 10;
                     if (getPlayerHealth() + healedAmount > 100) {
@@ -223,24 +213,53 @@ public class FightMenu extends Battle {
                     } else {
                         setPlayerHealth(getPlayerHealth() + healedAmount);
                     }
-                    numberOfDialogueBox = 7;
-                    numberOfDialogueEnemy = 8;
+                    numberOfDialogueBox = 6;
+                    numberOfDialogueEnemy = 7;
+                    isChoicePicked = true;
                 }
                 keyH.setEnterPressed(false);
                 enemyAttack();
-            } else if (keyH.isEnterPressed() && positionOfHeart == 3 && hpOfEnemy > 0 && numberOfTurn == 0) {
+            } else if (keyH.isEnterPressed() && positionOfHeart == 3 && hpOfEnemy > 0 && numberOfTurn == 0
+                    && !isChoicePicked) {
                 double chanceOfSpare = random.nextDouble() - hpOfEnemy / 1000 * 5;
+                isChoicePicked = true;
                 if (chanceOfSpare > 0.0) {
                     System.out.println("You spared the enemy with an " + chanceOfSpare + " chance");
                     gp.resetEncounterTile(2);
                     gp.changeFightMenu(false);
                     return;
                 } else {
-                    numberOfDialogueBox = 9;
-                    numberOfDialogueEnemy = 10;
+                    numberOfDialogueBox = 8;
+                    numberOfDialogueEnemy = 9;
                     enemyAttack();
                 }
                 keyH.setEnterPressed(false);
+            }
+            if (actOptionsOpen && isChoicePicked) {
+                if (keyH.isDownPressed() && actHeartPosition == 0) {
+                    yOfHeartAct = gp.getScreenHeight() / 3 + 30 + 60;
+                    actHeartPosition++;
+                    keyH.setDownPressed(false);
+                } else if (keyH.isUpPressed() && actHeartPosition == 1) {
+                    yOfHeartAct = gp.getScreenHeight() / 3 + 30;
+                    actHeartPosition--;
+                    keyH.setUpPressed(false);
+                }
+                if (keyH.isEnterPressed() && actHeartPosition == 0) {
+                    keyH.setEnterPressed(false);
+                    numberOfDialogueBox = 5;
+                    numberOfDialogueEnemy = 11;
+                    actOptionsOpen = false;
+                    isChoicePicked = false;
+                    enemyAttack();
+                } else if (keyH.isEnterPressed() && actHeartPosition == 1) {
+                    keyH.setEnterPressed(false);
+                    numberOfDialogueEnemy = 4;
+                    numberOfDialogueBox = 3;
+                    actOptionsOpen = false;
+                    isChoicePicked = false;
+                    enemyAttack();
+                }
             }
         }
 
@@ -256,6 +275,7 @@ public class FightMenu extends Battle {
         if (projectiles.size() == 0 && numberOfTurn == 1) {
             gp.changeTurn("-");
             numberOfTurn--;
+            isChoicePicked = false;
             setBattleTurn();
         }
     }
@@ -291,7 +311,7 @@ public class FightMenu extends Battle {
         // g2.setColor(Color.green);
         // g2.drawRect(battleRect.x, battleRect.y, battleRect.width, battleRect.height);
 
-        g2.setFont(new Font("TimesRoman", Font.BOLD, 25));
+        g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
         if (getNumberOfTurn() == 1) {
             g2.drawImage(dialogBox, (gp.getScreenWidth()) / 2 + enemyImages[0].getWidth() * 2, gp.getTileSize(),
                     dialogBox.getWidth() * 2 - 50,
@@ -300,9 +320,6 @@ public class FightMenu extends Battle {
             g2.drawString(enemyDialogue[numberOfDialogueEnemy],
                     (gp.getScreenWidth()) / 2 + enemyImages[0].getWidth() * 2 + 60,
                     gp.getTileSize() + 40);
-            g2.drawString(enemyDialogue[numberOfDialogueEnemy + 1],
-                    (gp.getScreenWidth()) / 2 + enemyImages[0].getWidth() * 2 + 60,
-                    gp.getTileSize() + 40 * 2);
 
         } else {
             g2.setColor(Color.WHITE);
@@ -311,12 +328,10 @@ public class FightMenu extends Battle {
         }
 
         if (actOptionsOpen) {
-            numberOfDialogueBox = 13;
+            numberOfDialogueBox = 12;
 
             int xOfChoice = xOfBattleRect + 20;
             int yOfChoice = gp.getScreenHeight() / 3 + 50;
-
-            yOfHeartAct += yOfChoice - 20;
 
             // Choice picker
             g2.drawImage(heart, xOfChoice - 5, yOfHeartAct, 20, 20, null);

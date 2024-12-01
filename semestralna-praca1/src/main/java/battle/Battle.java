@@ -32,18 +32,17 @@ public class Battle {
     private String[] floweyDialogue = {
             "You've encountered Flowey!", // Encounter
             "You attacked Flowey!", // Attack action
-            "Trying to attack me with that?",
-            "How pathetic!", // Attack action
+            "Trying to attack me with that?, How pathetic!",
             "You beg Flowey to stop.",
             "Stop? We're just getting started!", // Begging
             "You check Flowey's stats. HP: 100, Damage: 10", // Checking stats
             "You used an item.", // Using an item
             "Healing? How cute!", // Using an item
-            "You tried to run, but Flowey blocks your path with his vines!", // Trying to run
+            "You tried to run, but Flowey blocks your path.", // Trying to run
             "You're not going anywhere!", // Trying to run
             "You won!", // Winning
             "Yes I am that strong!", // Checking stats
-            "" // Clear dialogue - 13
+            "" // Clear dialogue - 12
     };
     private String[] floweyActOptions = { "Check", "Beg" };
 
