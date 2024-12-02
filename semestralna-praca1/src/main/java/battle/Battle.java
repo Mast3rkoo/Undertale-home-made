@@ -38,7 +38,7 @@ public class Battle {
             "You check Flowey's stats. HP: 100, Damage: 10", // Checking stats
             "You used an item.", // Using an item
             "Healing? How cute!", // Using an item
-            "You tried to run, but Flowey blocks your path.", // Trying to run
+            "You tried to run, but Flowey blocked your path.", // Trying to run
             "You're not going anywhere!", // Trying to run
             "You won!", // Winning
             "Yes I am that strong!", // Checking stats
@@ -48,7 +48,7 @@ public class Battle {
 
     public Battle(GamePanel gp) {
         xOfBattleRect = gp.getScreenWidth() / 10;
-        yOfBattleRect = gp.getScreenHeight() / 3;
+        yOfBattleRect = gp.getScreenHeight() / 5 * 2;
 
         widthOfBattleRect = gp.getScreenWidth() - 80;
         heightOfBattleRect = 270;
@@ -91,6 +91,25 @@ public class Battle {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private BufferedImage[] getDummyImages() {
+        BufferedImage dummy = null;
+        try {
+            dummy = ImageIO.read(getClass().getResourceAsStream("/res/enemy/dummy.png"));
+            return splitEnemyImages(dummy, 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public BufferedImage[] getDummyAttributes() {
+        this.enemyHp = 200;
+        this.enemyDamage = 5;
+        this.enemyDialogue = floweyDialogue;
+        this.actOptions = floweyActOptions;
+        return getDummyImages();
     }
 
     public String[] getActOptions() {

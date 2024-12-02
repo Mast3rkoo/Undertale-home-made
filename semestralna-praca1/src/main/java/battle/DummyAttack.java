@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 import semestralka.GamePanel;
 
-public class Projectile extends Battle {
+public class DummyAttack extends Battle {
     private GamePanel gp;
     private FightMenu fightMenu;
     private PlayerHeart playerHeart;
@@ -27,7 +27,7 @@ public class Projectile extends Battle {
     private String whichSide;
     private int sizeOfBullet;
 
-    public Projectile(GamePanel gp, PlayerHeart playerHeart) {
+    public DummyAttack(GamePanel gp, PlayerHeart playerHeart) {
         super(gp);
         this.gp = gp;
         this.playerHeart = playerHeart;
@@ -54,7 +54,7 @@ public class Projectile extends Battle {
 
         int tempWidthOfBattleRect = gp.getScreenWidth() / 3;
         int tempxOfBattleRect = (gp.getScreenWidth() - tempWidthOfBattleRect) / 2;
-        int tempyOfBattleRect = gp.getScreenHeight() / 3;
+        int tempyOfBattleRect = gp.getScreenHeight() / 5 * 2;
         int tempHeightOfBattleRect = 270;
 
         // Choosing random starting position of bullet based on width of rectangle

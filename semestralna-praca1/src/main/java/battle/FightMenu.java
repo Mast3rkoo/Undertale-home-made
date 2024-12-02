@@ -20,7 +20,7 @@ import semestralka.KeyHandler;
 public class FightMenu extends Battle {
     private GamePanel gp;
     private KeyHandler keyH;
-    private Projectile projectile;
+    private DummyAttack projectile;
     private PlayerHeart playerHeart;
     private BufferedImage heart, dialogBox, actionButtons;
     private BufferedImage[] enemyImages = new BufferedImage[4];
@@ -32,8 +32,8 @@ public class FightMenu extends Battle {
     private Random random;
     private int numberOfSprite;
     private String battleMessage;
-    private ArrayList<Projectile> projectiles;
-    private List<Projectile> tempProjectiles;
+    private ArrayList<DummyAttack> projectiles;
+    private List<DummyAttack> tempProjectiles;
     private int xOfBattleRect, widthOfBattleRect;
     private int xOfButton, yOfButton;
     private int buttonImageWidth, buttonImageHeight;
@@ -110,10 +110,12 @@ public class FightMenu extends Battle {
     public void setEnemy(String enemy) {
         if (enemy.equals("flowey")) {
             enemyImages = getFloweyAttributes();
-            hpOfEnemy = getEnemyHp();
-            enemyDialogue = getEnemyDialogue();
-            actOptions = getActOptions();
+        } else if (enemy.equals("dummy")) {
+            enemyImages = getDummyAttributes();
         }
+        hpOfEnemy = getEnemyHp();
+        enemyDialogue = getEnemyDialogue();
+        actOptions = getActOptions();
     }
 
     public void enemyAttack() {
@@ -155,6 +157,8 @@ public class FightMenu extends Battle {
     }
 
     public void setEncounter(boolean fightMenu) {
+        // Create a delay of 1 second (1000 ms)
+        gp.getPlayer().setEnemyEncounterAlert(true);
         System.out.println("Setting fight menu to " + fightMenu);
         gp.drawEncounter(fightMenu);
     }
@@ -211,10 +215,10 @@ public class FightMenu extends Battle {
                     } else {
                         setPlayerHealth(getPlayerHealth() + healedAmount);
                     }
-                    numberOfDialogueBox = 6;
-                    numberOfDialogueEnemy = 7;
-                    isChoicePicked = true;
                 }
+                numberOfDialogueBox = 6;
+                numberOfDialogueEnemy = 7;
+                isChoicePicked = true;
                 enemyAttack();
             } else if (keyH.isEnterPressed() && positionOfHeart == 3 && hpOfEnemy > 0 && numberOfTurn == 0
                     && !isChoicePicked) {
@@ -262,7 +266,7 @@ public class FightMenu extends Battle {
         }
 
         if (projectiles.size() > 0) {
-            for (Projectile projectile : tempProjectiles) {
+            for (DummyAttack projectile : tempProjectiles) {
                 projectile.update();
                 if (!projectile.getBulletActive()) {
                     projectiles.remove(projectile);
@@ -298,7 +302,7 @@ public class FightMenu extends Battle {
 
     public void makeProjectile(int speed, int damage, String whichSide) {
         setBattleTurn();
-        projectile = new Projectile(gp, playerHeart);
+        projectile = new DummyAttack(gp, playerHeart);
         projectile.setFightMenu(this, whichSide);
         projectiles.add(projectile);
         projectile.bulletLogic(speed, damage);
@@ -323,14 +327,14 @@ public class FightMenu extends Battle {
         } else {
             g2.setColor(Color.WHITE);
             g2.drawString(enemyDialogue[numberOfDialogueBox], xOfBattleRect + battleMessage.length(),
-                    gp.getScreenHeight() / 3 + battleMessage.length() * 2);
+                    gp.getScreenHeight() / 5 * 2 + battleMessage.length() * 2);
         }
 
         if (actOptionsOpen) {
             numberOfDialogueBox = 12;
 
             int xOfChoice = xOfBattleRect + 20;
-            int yOfChoice = gp.getScreenHeight() / 3 + 50;
+            int yOfChoice = gp.getScreenHeight() / 5 * 2 + 50;
 
             // Choice picker
             g2.drawImage(heart, xOfChoice - 5, yOfHeartAct, 20, 20, null);
@@ -345,7 +349,7 @@ public class FightMenu extends Battle {
 
         g2.setStroke(new BasicStroke(3));
         g2.setColor(Color.WHITE);
-        g2.drawRect(xOfBattleRect, gp.getScreenHeight() / 3, widthOfBattleRect,
+        g2.drawRect(xOfBattleRect, gp.getScreenHeight() / 5 * 2, widthOfBattleRect,
                 getHeightOfBattleRect());
 
         // Enemy
@@ -464,7 +468,7 @@ public class FightMenu extends Battle {
         g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5,
                 getPlayerHealth(), 15);
 
-        for (Projectile projectile : tempProjectiles) {
+        for (DummyAttack projectile : tempProjectiles) {
             projectile.draw(g2);
         }
     }
