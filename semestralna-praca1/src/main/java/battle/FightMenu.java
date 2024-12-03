@@ -25,6 +25,8 @@ public class FightMenu extends Battle {
     private BufferedImage heart, dialogBox, actionButtons;
     private BufferedImage[] enemyImages = new BufferedImage[4];
     private BufferedImage[] actionButtonImages = new BufferedImage[8];
+    private int enemyWidth;
+    private int enemyHeight;
     private int subImageWidthActions;
     private int subImageHeightActions;
     private int positionOfHeart = 0;
@@ -116,6 +118,8 @@ public class FightMenu extends Battle {
         hpOfEnemy = getEnemyHp();
         enemyDialogue = getEnemyDialogue();
         actOptions = getActOptions();
+        enemyWidth = getEnemyWidth();
+        enemyHeight = getEnemyHeight();
     }
 
     public void enemyAttack() {
@@ -186,7 +190,7 @@ public class FightMenu extends Battle {
                     && !isChoicePicked) {
                 keyH.setEnterPressed(false);
                 // Attack logic
-                numberOfSprite = 3;
+                numberOfSprite = 1;
                 hpOfEnemy -= random.nextInt(21) + 10;
                 numberOfDialogueEnemy = 2;
                 // Changes sprite to make it look like it hurt the enemy and then changes it
@@ -354,18 +358,18 @@ public class FightMenu extends Battle {
 
         // Enemy
         g2.drawImage(enemyImages[numberOfSprite],
-                (gp.getScreenWidth() - (enemyImages[0].getWidth() * 3)) / 2,
+                (gp.getScreenWidth() - (enemyWidth)) / 2,
                 gp.getTileSize(),
-                enemyImages[0].getWidth() * 3,
-                enemyImages[0].getHeight() * 3, null);
+                enemyWidth,
+                enemyHeight, null);
         // Enemy health bar
         g2.setColor(Color.RED);
-        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10,
-                gp.getScreenHeight() / 5 + enemyImages[0].getHeight(), 100,
+        g2.fillRect(gp.getScreenWidth() / 2 - 100,
+                gp.getTileSize() + getEnemyHeight(), getEnemyHp(),
                 15);
         g2.setColor(Color.GREEN);
-        g2.fillRect(gp.getScreenWidth() / 2 - enemyImages[0].getWidth() - 10,
-                gp.getScreenHeight() / 5 + enemyImages[0].getHeight(),
+        g2.fillRect(gp.getScreenWidth() / 2 - 100,
+                gp.getTileSize() + getEnemyHeight(),
                 hpOfEnemy,
                 15);
 

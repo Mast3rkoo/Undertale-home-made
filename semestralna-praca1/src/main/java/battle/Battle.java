@@ -27,6 +27,8 @@ public class Battle {
     private BufferedImage[] enemyImages = new BufferedImage[4];
     private int enemyHp;
     private int enemyDamage;
+    private int enemyWidth;
+    private int enemyHeight;
     private String[] enemyDialogue;
     private String[] actOptions;
     private String[] floweyDialogue = {
@@ -79,6 +81,8 @@ public class Battle {
         this.enemyDamage = 10;
         this.enemyDialogue = floweyDialogue;
         this.actOptions = floweyActOptions;
+        this.enemyWidth = 100;
+        this.enemyHeight = 100;
         return getFloweyImages();
     }
 
@@ -86,7 +90,7 @@ public class Battle {
         BufferedImage flowey = null;
         try {
             flowey = ImageIO.read(getClass().getResourceAsStream("/res/enemy/flowey.png"));
-            return splitEnemyImages(flowey, 4);
+            return splitEnemyImages(flowey, 2);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -109,6 +113,8 @@ public class Battle {
         this.enemyDamage = 5;
         this.enemyDialogue = floweyDialogue;
         this.actOptions = floweyActOptions;
+        this.enemyWidth = 120;
+        this.enemyHeight = 180;
         return getDummyImages();
     }
 
@@ -122,6 +128,14 @@ public class Battle {
 
     public int getEnemyDamage() {
         return this.enemyDamage;
+    }
+
+    public int getEnemyWidth() {
+        return this.enemyWidth;
+    }
+
+    public int getEnemyHeight() {
+        return this.enemyHeight;
     }
 
     public String[] getEnemyDialogue() {
