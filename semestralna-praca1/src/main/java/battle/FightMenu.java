@@ -126,7 +126,7 @@ public class FightMenu extends Battle {
         gp.changeTurn("+");
         setNumberOfTurn(1);
         setBattleTurn();
-        int numberOfProjectiles = random.nextInt(10) + 30;
+        int numberOfProjectiles = 3; // random.nextInt(10) + 5;
         int randomSide = random.nextInt(3);
         String side = "";
         switch (randomSide) {
@@ -146,7 +146,7 @@ public class FightMenu extends Battle {
                 break;
         }
         while (numberOfProjectiles > 0) {
-            makeProjectile(4, random.nextInt(10) + getEnemyDamage(), side);
+            makeProjectile(2, random.nextInt(10) + getEnemyDamage(), "top");
             numberOfProjectiles--;
         }
         tempProjectiles = new ArrayList<>(projectiles);

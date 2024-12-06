@@ -23,9 +23,10 @@ public class DummyAttack extends Battle {
     private boolean alreadyHit = false;
     private int bulletSpeed;
     private int bulletDamage;
-    private Random random;
     private String whichSide;
     private int sizeOfBullet;
+    private long lastSavedTimeForExplosion;
+    private boolean bulletExploded = false;
 
     public DummyAttack(GamePanel gp, PlayerHeart playerHeart) {
         super(gp);
@@ -37,7 +38,6 @@ public class DummyAttack extends Battle {
         bulletSpeed = 0;
         bulletDamage = 0;
         sizeOfBullet = getHeightOfBattleRect() / 40;
-        random = new Random();
     }
 
     public void getProjectile() {
@@ -46,6 +46,10 @@ public class DummyAttack extends Battle {
         } catch (IOException i) {
             i.printStackTrace();
         }
+    }
+
+    public void timerBeforeExplosion() {
+        lastSavedTimeForExplosion = System.currentTimeMillis();
     }
 
     public void setFightMenu(FightMenu fightMenu, String whichSide) {
@@ -90,8 +94,9 @@ public class DummyAttack extends Battle {
             System.out.println("Error in setting bullet position");
         }
 
-        bulletHitBox = new Rectangle(xOfBullet + bullet.getWidth(), yOfBullet, sizeOfBullet,
-                sizeOfBullet);
+        bulletHitBox = new Rectangle(xOfBullet + bullet.getWidth(), yOfBullet, sizeOfBullet, sizeOfBullet);
+
+        timerBeforeExplosion();
     }
 
     public void checkBulletCollision() {
@@ -147,29 +152,29 @@ public class DummyAttack extends Battle {
     public void update() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastSavedTime >= 20) {
-            switch (whichSide) {
-                case "top":
-                    yOfBullet += bulletSpeed;
-                    xOfBullet += random.nextInt(5) - 2;
-                    break;
-                case "bottom":
-                    yOfBullet -= bulletSpeed;
-                    xOfBullet += random.nextInt(5) - 2;
-                    break;
-                case "left":
-                    xOfBullet += bulletSpeed;
-                    yOfBullet += random.nextInt(5) - 2;
-                    break;
-                case "right":
-                    xOfBullet -= bulletSpeed;
-                    yOfBullet += random.nextInt(5) - 2;
-                    break;
-                default:
-                    break;
+            if (currentTime - lastSavedTimeForExplosion < 2500) {
+                switch (whichSide) {
+                    case "top":
+                        yOfBullet += bulletSpeed;
+                        break;
+                    case "bottom":
+                        yOfBullet -= bulletSpeed;
+                        break;
+                    case "left":
+                        xOfBullet += bulletSpeed;
+                        break;
+                    case "right":
+                        xOfBullet -= bulletSpeed;
+                        break;
+                    default:
+                        break;
+                }
+                bulletHitBox.x = xOfBullet + bullet.getWidth();
+                bulletHitBox.y = yOfBullet;
+                lastSavedTime = currentTime;
+            } else {
+                bulletExploded = true;
             }
-            bulletHitBox.x = xOfBullet + bullet.getWidth();
-            bulletHitBox.y = yOfBullet;
-            lastSavedTime = currentTime;
         }
         checkBulletCollision();
     }
@@ -177,10 +182,15 @@ public class DummyAttack extends Battle {
     public void draw(Graphics2D g2) {
         if (bulletActive) {
             g2.setColor(Color.BLUE); // For missile hitbox
-            g2.drawRect(bulletHitBox.x, bulletHitBox.y, bulletHitBox.width,
-                    bulletHitBox.height);
-
+            g2.drawRect(bulletHitBox.x, bulletHitBox.y, bulletHitBox.width, bulletHitBox.height);
             g2.drawImage(bullet, xOfBullet + bullet.getWidth(), yOfBullet, null);
+            if (bulletExploded) {
+                g2.setColor(Color.RED);
+                g2.drawImage(bullet, xOfBullet + bullet.getWidth() + 5, yOfBullet, null);
+                g2.drawImage(bullet, xOfBullet + bullet.getWidth() - 5, yOfBullet, null);
+                g2.drawImage(bullet, xOfBullet + bullet.getWidth(), yOfBullet + 5, null);
+                g2.drawImage(bullet, xOfBullet + bullet.getWidth(), yOfBullet - 5, null);
+            }
         }
     }
 }
