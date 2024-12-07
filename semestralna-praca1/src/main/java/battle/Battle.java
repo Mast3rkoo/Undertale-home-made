@@ -29,6 +29,7 @@ public class Battle {
     private int enemyDamage;
     private int enemyWidth;
     private int enemyHeight;
+    private int delayBetweenBullets;
     private String[] enemyDialogue;
     private String[] actOptions;
     private String[] floweyDialogue = {
@@ -83,6 +84,7 @@ public class Battle {
         this.actOptions = floweyActOptions;
         this.enemyWidth = 100;
         this.enemyHeight = 100;
+        this.delayBetweenBullets = 100;
         return getFloweyImages();
     }
 
@@ -115,6 +117,7 @@ public class Battle {
         this.actOptions = floweyActOptions;
         this.enemyWidth = 120;
         this.enemyHeight = 180;
+        this.delayBetweenBullets = 200;
         return getDummyImages();
     }
 
@@ -140,6 +143,10 @@ public class Battle {
 
     public String[] getEnemyDialogue() {
         return this.enemyDialogue;
+    }
+
+    public int getDelayBetweenBullets() {
+        return this.delayBetweenBullets;
     }
 
     public int getWidthOfBattleRect() {

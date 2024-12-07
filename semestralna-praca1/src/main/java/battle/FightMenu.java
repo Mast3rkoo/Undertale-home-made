@@ -36,6 +36,7 @@ public class FightMenu extends Battle {
     private String battleMessage;
     private ArrayList<DummyAttack> projectiles;
     private List<DummyAttack> tempProjectiles;
+    private int delayBetweenBullets;
     private int xOfBattleRect, widthOfBattleRect;
     private int xOfButton, yOfButton;
     private int buttonImageWidth, buttonImageHeight;
@@ -120,13 +121,14 @@ public class FightMenu extends Battle {
         actOptions = getActOptions();
         enemyWidth = getEnemyWidth();
         enemyHeight = getEnemyHeight();
+        delayBetweenBullets = getDelayBetweenBullets();
     }
 
     public void enemyAttack() {
         gp.changeTurn("+");
         setNumberOfTurn(1);
         setBattleTurn();
-        int numberOfProjectiles = 3; // random.nextInt(10) + 5;
+        int numberOfProjectiles = random.nextInt(10) + 5;
         int randomSide = random.nextInt(3);
         String side = "";
         switch (randomSide) {
@@ -146,7 +148,7 @@ public class FightMenu extends Battle {
                 break;
         }
         while (numberOfProjectiles > 0) {
-            makeProjectile(2, random.nextInt(10) + getEnemyDamage(), "top");
+            makeProjectile(2, random.nextInt(10) + getEnemyDamage(), side, delayBetweenBullets);
             numberOfProjectiles--;
         }
         tempProjectiles = new ArrayList<>(projectiles);
@@ -164,6 +166,8 @@ public class FightMenu extends Battle {
         // Create a delay of 1 second (1000 ms)
         gp.getPlayer().setEnemyEncounterAlert(true);
         System.out.println("Setting fight menu to " + fightMenu);
+        // Remove pressed enter
+        keyH.setEnterPressed(false);
         gp.drawEncounter(fightMenu);
     }
 
@@ -304,12 +308,17 @@ public class FightMenu extends Battle {
         }
     }
 
-    public void makeProjectile(int speed, int damage, String whichSide) {
+    public void makeProjectile(int speed, int damage, String whichSide, int delayBetweenBullets) {
+        // TODO MAKE THE DELAY BETWEEN BULLETS WORK
         setBattleTurn();
+        long time = System.currentTimeMillis();
         projectile = new DummyAttack(gp, playerHeart);
         projectile.setFightMenu(this, whichSide);
         projectiles.add(projectile);
         projectile.bulletLogic(speed, damage);
+        while (time + delayBetweenBullets > System.currentTimeMillis()) {
+            // Wait
+        }
     }
 
     public void drawFightMenu(Graphics2D g2) {
