@@ -30,6 +30,7 @@ public class DummyAttack extends Battle {
     private long lastSavedTimeForExplosion;
     private boolean bulletExploded = false;
     private ArrayList<Rectangle> bulletsHitbox = new ArrayList<>();
+    private int randomExplosionDelay;
 
     public DummyAttack(GamePanel gp, PlayerHeart playerHeart) {
         super(gp);
@@ -42,6 +43,7 @@ public class DummyAttack extends Battle {
         bulletDamage = 0;
         sizeOfBigBullet = getHeightOfBattleRect() / 20;
         sizeOfBullet = getHeightOfBattleRect() / 40;
+        randomExplosionDelay = new Random().nextInt(2000) + 1000;
     }
 
     public void getProjectile() {
@@ -182,20 +184,21 @@ public class DummyAttack extends Battle {
 
     public void update() {
         long currentTime = System.currentTimeMillis();
+        int randomSpeed = new Random().nextInt(3) + 1;
         if (currentTime - lastSavedTime >= 20) {
-            if (currentTime - lastSavedTimeForExplosion < 2500) {
+            if (currentTime - lastSavedTimeForExplosion < randomExplosionDelay - 300 * bulletSpeed) {
                 switch (whichSide) {
                     case "top":
-                        yOfBullet += bulletSpeed;
+                        yOfBullet += bulletSpeed + randomSpeed;
                         break;
                     case "bottom":
-                        yOfBullet -= bulletSpeed;
+                        yOfBullet -= bulletSpeed + randomSpeed;
                         break;
                     case "left":
-                        xOfBullet += bulletSpeed;
+                        xOfBullet += bulletSpeed + randomSpeed;
                         break;
                     case "right":
-                        xOfBullet -= bulletSpeed;
+                        xOfBullet -= bulletSpeed + randomSpeed;
                         break;
                     default:
                         break;
@@ -225,10 +228,10 @@ public class DummyAttack extends Battle {
 
                     switch (i % 4) {
                         case 0:
-                            bullet.x += bulletSpeed;
+                            bullet.x += bulletSpeed + 1;
                             break;
                         case 1:
-                            bullet.x -= bulletSpeed;
+                            bullet.x -= bulletSpeed + 1;
                             break;
                         case 2:
                             bullet.y += bulletSpeed;

@@ -128,7 +128,7 @@ public class FightMenu extends Battle {
         gp.changeTurn("+");
         setNumberOfTurn(1);
         setBattleTurn();
-        int numberOfProjectiles = random.nextInt(10) + 5;
+        int numberOfProjectiles = random.nextInt(10) + 10;
         int randomSide = random.nextInt(3);
         String side = "";
         switch (randomSide) {
@@ -309,16 +309,11 @@ public class FightMenu extends Battle {
     }
 
     public void makeProjectile(int speed, int damage, String whichSide, int delayBetweenBullets) {
-        // TODO MAKE THE DELAY BETWEEN BULLETS WORK
         setBattleTurn();
-        long time = System.currentTimeMillis();
         projectile = new DummyAttack(gp, playerHeart);
         projectile.setFightMenu(this, whichSide);
         projectiles.add(projectile);
         projectile.bulletLogic(speed, damage);
-        while (time + delayBetweenBullets > System.currentTimeMillis()) {
-            // Wait
-        }
     }
 
     public void drawFightMenu(Graphics2D g2) {
