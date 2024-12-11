@@ -27,9 +27,11 @@ public class GamePanel extends JPanel implements Runnable {
 
     // WORLD SETTINGS
     private final int maxWorldColumn = 32; // 32 tiles
-    private final int maxWorldRow = 18; // 18 tiles
+    private final int maxWorldRow = 12; // 18 tiles
 
     private double delta;
+
+    private int room = 1;
 
     private KeyHandler keyH = new KeyHandler();
     private Thread gameThread;
@@ -81,6 +83,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public int getRoom() {
+        return room;
+    }
+
+    public void setRoom(int room) {
+        this.room = room;
     }
 
     public TileManager getTileManager() {
@@ -136,7 +146,11 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void resetEncounterTile(int tile) {
-        tileManager.resetEncounterTile(tile);
+        tileManager.resetEncounterTile(room, tile);
+    }
+
+    public void setCollisionTile(int tile) {
+        tileManager.setCollisionTile(room, tile);
     }
 
     public void drawEncounter(boolean fightMenu) {
@@ -167,7 +181,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         Graphics2D g2 = (Graphics2D) g;
         if (!battle.getFightMenu()) {
-            tileManager.draw(g2);
+            tileManager.draw(g2, room);
             player.draw(g2);
         } else if (battle.getFightMenu()) {
             fightMenu.drawFightMenu(g2);

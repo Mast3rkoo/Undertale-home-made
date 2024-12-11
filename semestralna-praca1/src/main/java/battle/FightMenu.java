@@ -50,6 +50,7 @@ public class FightMenu extends Battle {
     private int actHeartPosition;
     private int yOfHeartAct;
     private boolean isChoicePicked;
+    private String chosenEnemy;
 
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         super(gp);
@@ -113,8 +114,10 @@ public class FightMenu extends Battle {
     public void setEnemy(String enemy) {
         if (enemy.equals("flowey")) {
             enemyImages = getFloweyAttributes();
+            chosenEnemy = "flowey";
         } else if (enemy.equals("dummy")) {
             enemyImages = getDummyAttributes();
+            chosenEnemy = "dummy";
         }
         hpOfEnemy = getEnemyHp();
         enemyDialogue = getEnemyDialogue();
@@ -163,19 +166,42 @@ public class FightMenu extends Battle {
     }
 
     public void setEncounter(boolean fightMenu) {
-        // Create a delay of 1 second (1000 ms)
         gp.getPlayer().setEnemyEncounterAlert(true);
         System.out.println("Setting fight menu to " + fightMenu);
         // Remove pressed enter
+        numberOfDialogueBox = 0;
+        numberOfDialogueEnemy = 0;
+        isChoicePicked = false;
+        actHeartPosition = 0;
+        actOptionsOpen = false;
+        positionOfHeart = 0;
+        heartLocationX = xOfButton + 13;
+        setNumberOfTurn(0);
         keyH.setEnterPressed(false);
         gp.drawEncounter(fightMenu);
+    }
+
+    private void removeEncounterTile() {
+        if (chosenEnemy.equals("flowey")) {
+            gp.resetEncounterTile(2);
+        } else if (chosenEnemy.equals("dummy")) {
+            gp.resetEncounterTile(79);
+            gp.resetEncounterTile(80);
+            gp.resetEncounterTile(81);
+            gp.resetEncounterTile(82);
+
+            gp.setCollisionTile(79);
+            gp.setCollisionTile(80);
+            gp.setCollisionTile(81);
+            gp.setCollisionTile(82);
+        }
     }
 
     public void update() {
         int numberOfTurn = getNumberOfTurn();
         // Action choices movement
         if (hpOfEnemy <= 0 || getPlayerHealth() <= 0) {
-            gp.resetEncounterTile(2);
+            removeEncounterTile();
             gp.changeFightMenu(false);
             return;
         }
@@ -235,7 +261,7 @@ public class FightMenu extends Battle {
                 isChoicePicked = true;
                 if (chanceOfSpare > 0.0) {
                     System.out.println("You spared the enemy with an " + chanceOfSpare + " chance");
-                    gp.resetEncounterTile(2);
+                    removeEncounterTile();
                     gp.changeFightMenu(false);
                     return;
                 } else {

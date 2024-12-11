@@ -13,7 +13,17 @@ public class HitBoxCheck {
         this.player = player;
     }
 
-    public void checkTileCollision() {
+    public void pickEnemyEncounter(int tileId1, int tileId2) {
+        if (tileId1 == 2 || tileId2 == 2) {
+            gp.getFightMenu().setEnemy("flowey");
+        } else if (tileId1 == 79 || tileId2 == 79 || tileId1 == 80 || tileId2 == 80 || tileId1 == 81 || tileId2 == 81
+                || tileId1 == 82 || tileId2 == 82) {
+            gp.getFightMenu().setEnemy("dummy");
+        }
+        player.setEnemyEncounterAlert(true);
+    }
+
+    public void checkTileCollision(int room) {
         Rectangle hitBox = player.getHitBox();
         int entityLeftEdge = player.getWorldX() + hitBox.x;
         int entityRightEdge = player.getWorldX() + hitBox.x + hitBox.width;
@@ -30,63 +40,63 @@ public class HitBoxCheck {
         switch (player.getDirection()) {
             case "up":
                 topTileRow = (entityTopEdge - player.getSpeed()) / gp.getTileSize();
-                tileId1 = gp.getTileManager().getMapTileNumber(leftTileColumn, topTileRow);
-                tileId2 = gp.getTileManager().getMapTileNumber(rightTileColumn, topTileRow);
-                if (gp.getTileManager().getTile(tileId1).isCollision()
-                        || gp.getTileManager().getTile(tileId2).isCollision()) {
-                    if (tileId1 == 17 || tileId1 == 18 || tileId1 == 19 || tileId2 == 17 || tileId2 == 18
-                            || tileId2 == 19) {
-                        player.setWalkThroughDoor(true);
-                    } else {
-                        player.setCollisionDetected(true);
+                tileId1 = gp.getTileManager().getMapTileNumber(room, leftTileColumn, topTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(room, rightTileColumn, topTileRow);
+                if (gp.getTileManager().getTile(room, tileId1).isCollision()
+                        || gp.getTileManager().getTile(room, tileId2).isCollision()) {
+                    if (room == 1) {
+                        if (tileId1 == 12 || tileId1 == 13 || tileId1 == 14 || tileId2 == 12 ||
+                                tileId2 == 13
+                                || tileId2 == 14) {
+                            player.setWalkThroughDoor(true);
+                        } else {
+                            player.setCollisionDetected(true);
+                        }
                     }
-                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
-                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
-
-                    gp.getFightMenu().setEnemy("flowey");
-                    player.setEnemyEncounterAlert(true);
+                    player.setCollisionDetected(true);
+                } else if (gp.getTileManager().getTile(room, tileId1).isEncounter()
+                        || gp.getTileManager().getTile(room, tileId2).isEncounter()) {
+                    pickEnemyEncounter(tileId1, tileId2);
                 }
                 break;
             case "down":
                 bottomTileRow = (entityBottomEdge + player.getSpeed()) / gp.getTileSize();
-                tileId1 = gp.getTileManager().getMapTileNumber(leftTileColumn, bottomTileRow);
-                tileId2 = gp.getTileManager().getMapTileNumber(rightTileColumn, bottomTileRow);
-                if (gp.getTileManager().getTile(tileId1).isCollision()
-                        || gp.getTileManager().getTile(tileId2).isCollision()) {
+                tileId1 = gp.getTileManager().getMapTileNumber(room, leftTileColumn,
+                        bottomTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(room, rightTileColumn,
+                        bottomTileRow);
+                if (gp.getTileManager().getTile(room, tileId1).isCollision()
+                        || gp.getTileManager().getTile(room, tileId2).isCollision()) {
                     player.setCollisionDetected(true);
-                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
-                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
-
-                    gp.getFightMenu().setEnemy("dummy");
-                    player.setEnemyEncounterAlert(true);
+                } else if (gp.getTileManager().getTile(room, tileId1).isEncounter()
+                        || gp.getTileManager().getTile(room, tileId2).isEncounter()) {
+                    pickEnemyEncounter(tileId1, tileId2);
                 }
                 break;
             case "left":
                 leftTileColumn = (entityLeftEdge - player.getSpeed()) / gp.getTileSize();
-                tileId1 = gp.getTileManager().getMapTileNumber(leftTileColumn, topTileRow);
-                tileId2 = gp.getTileManager().getMapTileNumber(leftTileColumn, bottomTileRow);
-                if (gp.getTileManager().getTile(tileId1).isCollision()
-                        || gp.getTileManager().getTile(tileId2).isCollision()) {
+                tileId1 = gp.getTileManager().getMapTileNumber(room, leftTileColumn, topTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(room, leftTileColumn,
+                        bottomTileRow);
+                if (gp.getTileManager().getTile(room, tileId1).isCollision()
+                        || gp.getTileManager().getTile(room, tileId2).isCollision()) {
                     player.setCollisionDetected(true);
-                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
-                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
-
-                    gp.getFightMenu().setEnemy("flowey");
-                    player.setEnemyEncounterAlert(true);
+                } else if (gp.getTileManager().getTile(room, tileId1).isEncounter()
+                        || gp.getTileManager().getTile(room, tileId2).isEncounter()) {
+                    pickEnemyEncounter(tileId1, tileId2);
                 }
                 break;
             case "right":
                 rightTileColumn = (entityRightEdge + player.getSpeed()) / gp.getTileSize();
-                tileId1 = gp.getTileManager().getMapTileNumber(rightTileColumn, topTileRow);
-                tileId2 = gp.getTileManager().getMapTileNumber(rightTileColumn, bottomTileRow);
-                if (gp.getTileManager().getTile(tileId1).isCollision()
-                        || gp.getTileManager().getTile(tileId2).isCollision()) {
+                tileId1 = gp.getTileManager().getMapTileNumber(room, rightTileColumn, topTileRow);
+                tileId2 = gp.getTileManager().getMapTileNumber(room, rightTileColumn,
+                        bottomTileRow);
+                if (gp.getTileManager().getTile(room, tileId1).isCollision()
+                        || gp.getTileManager().getTile(room, tileId2).isCollision()) {
                     player.setCollisionDetected(true);
-                } else if (gp.getTileManager().getTile(tileId1).isEncounter()
-                        || gp.getTileManager().getTile(tileId2).isEncounter()) {
-
-                    gp.getFightMenu().setEnemy("flowey");
-                    player.setEnemyEncounterAlert(true);
+                } else if (gp.getTileManager().getTile(room, tileId1).isEncounter()
+                        || gp.getTileManager().getTile(room, tileId2).isEncounter()) {
+                    pickEnemyEncounter(tileId1, tileId2);
                 }
                 break;
             default:

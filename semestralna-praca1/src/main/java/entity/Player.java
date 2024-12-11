@@ -119,7 +119,7 @@ public class Player extends Entity {
             }
 
             setCollisionDetected(false);
-            gp.getHitBoxCheck().checkTileCollision();
+            gp.getHitBoxCheck().checkTileCollision(gp.getRoom());
 
             if (!isCollisionDetected()) {
                 if (keyH.isUpPressed() && !keyH.isRightPressed() && !keyH.isLeftPressed()
@@ -150,9 +150,10 @@ public class Player extends Entity {
             }
 
             if (isWalkThroughDoor()) {
-                this.tileManager.loadMap(String.format("/res/maps/map00%s.txt", level));
+                this.tileManager.loadMap(String.format("/res/maps/map00%s.txt", 2), level);
                 setDefaultValues(gp.getTileSize() * 5, gp.getTileSize() * 7);
                 setWalkThroughDoor(false);
+                gp.setRoom(level);
                 this.level++;
             }
 
