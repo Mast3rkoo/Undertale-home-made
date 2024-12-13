@@ -16,8 +16,8 @@ public class HitBoxCheck {
     public void pickEnemyEncounter(int tileId1, int tileId2) {
         if (tileId1 == 2 || tileId2 == 2) {
             gp.getFightMenu().setEnemy("flowey");
-        } else if (tileId1 == 79 || tileId2 == 79 || tileId1 == 80 || tileId2 == 80 || tileId1 == 81 || tileId2 == 81
-                || tileId1 == 82 || tileId2 == 82) {
+        } else if (tileId1 == 33 || tileId2 == 33 || tileId1 == 34 || tileId2 == 34 || tileId1 == 35 || tileId2 == 35
+                || tileId1 == 36 || tileId2 == 36) {
             gp.getFightMenu().setEnemy("dummy");
         }
         player.setEnemyEncounterAlert(true);
@@ -44,16 +44,26 @@ public class HitBoxCheck {
                 tileId2 = gp.getTileManager().getMapTileNumber(room, rightTileColumn, topTileRow);
                 if (gp.getTileManager().getTile(room, tileId1).isCollision()
                         || gp.getTileManager().getTile(room, tileId2).isCollision()) {
-                    if (room == 1) {
-                        if (tileId1 == 12 || tileId1 == 13 || tileId1 == 14 || tileId2 == 12 ||
-                                tileId2 == 13
-                                || tileId2 == 14) {
-                            player.setWalkThroughDoor(true);
-                        } else {
+                    switch (room) {
+                        case 1:
+                            if (tileId1 == 12 || tileId1 == 13 || tileId1 == 14 || tileId2 == 12 ||
+                                    tileId2 == 13
+                                    || tileId2 == 14) {
+                                player.setWalkThroughDoor(true);
+                            } else {
+                                player.setCollisionDetected(true);
+                            }
+                            break;
+                        case 2:
+                            if (tileId1 == 0 || tileId2 == 0) {
+                                player.setWalkThroughDoor(true);
+                            } else {
+                                player.setCollisionDetected(true);
+                            }
+                        default:
                             player.setCollisionDetected(true);
-                        }
+                            break;
                     }
-                    player.setCollisionDetected(true);
                 } else if (gp.getTileManager().getTile(room, tileId1).isEncounter()
                         || gp.getTileManager().getTile(room, tileId2).isEncounter()) {
                     pickEnemyEncounter(tileId1, tileId2);

@@ -150,8 +150,12 @@ public class Player extends Entity {
             }
 
             if (isWalkThroughDoor()) {
-                this.tileManager.loadMap(String.format("/res/maps/map00%s.txt", 2), level);
-                setDefaultValues(gp.getTileSize() * 5, gp.getTileSize() * 7);
+                this.tileManager.loadMap(String.format("/res/maps/map00%s.txt", this.level), this.level);
+                if (this.level == 2) {
+                    setDefaultValues(gp.getTileSize() * 5, gp.getTileSize() * 7);
+                } else {
+                    setDefaultValues(gp.getTileSize() * 3, gp.getTileSize() * 6);
+                }
                 setWalkThroughDoor(false);
                 gp.setRoom(level);
                 this.level++;

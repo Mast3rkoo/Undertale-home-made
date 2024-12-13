@@ -112,6 +112,7 @@ public class FightMenu extends Battle {
     }
 
     public void setEnemy(String enemy) {
+        System.out.print(enemy);
         if (enemy.equals("flowey")) {
             enemyImages = getFloweyAttributes();
             chosenEnemy = "flowey";
@@ -119,6 +120,7 @@ public class FightMenu extends Battle {
             enemyImages = getDummyAttributes();
             chosenEnemy = "dummy";
         }
+        System.out.print(chosenEnemy);
         hpOfEnemy = getEnemyHp();
         enemyDialogue = getEnemyDialogue();
         actOptions = getActOptions();
@@ -185,15 +187,15 @@ public class FightMenu extends Battle {
         if (chosenEnemy.equals("flowey")) {
             gp.resetEncounterTile(2);
         } else if (chosenEnemy.equals("dummy")) {
-            gp.resetEncounterTile(79);
-            gp.resetEncounterTile(80);
-            gp.resetEncounterTile(81);
-            gp.resetEncounterTile(82);
+            gp.resetEncounterTile(33);
+            gp.resetEncounterTile(34);
+            gp.resetEncounterTile(35);
+            gp.resetEncounterTile(36);
 
-            gp.setCollisionTile(79);
-            gp.setCollisionTile(80);
-            gp.setCollisionTile(81);
-            gp.setCollisionTile(82);
+            gp.setCollisionTile(33);
+            gp.setCollisionTile(34);
+            gp.setCollisionTile(35);
+            gp.setCollisionTile(36);
         }
     }
 

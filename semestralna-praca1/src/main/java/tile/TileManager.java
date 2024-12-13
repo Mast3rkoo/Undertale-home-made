@@ -21,12 +21,10 @@ public class TileManager {
     private int[][] mapTileNumberRoom3;
     private int tileArrayLenghtRoom1 = 42;
     private int tileArrayLenghtRoom2 = 37;
-    private int tileArrayLenghtRoom3 = 57;
+    private int tileArrayLenghtRoom3 = 58;
     private String[] tileArrayPathsRoom1;
     private String[] tileArrayPathsRoom2;
     private String[] tileArrayPathsRoom3;
-
-    private int[] encounterTiles = { 2, 3, 4, 5, 6, 7, 79, 80, 81, 82 };
 
     public TileManager(GamePanel gp) {
         this.gp = gp;
@@ -162,6 +160,46 @@ public class TileManager {
         tileArrayPathsRoom3[15] = "/res/tiles/room3/row-2-column-5.png";
         tileArrayPathsRoom3[16] = "/res/tiles/room3/row-2-column-6.png";
         tileArrayPathsRoom3[17] = "/res/tiles/room3/row-2-column-7.png";
+        tileArrayPathsRoom3[18] = "/res/tiles/room3/row-2-column-8.png";
+        tileArrayPathsRoom3[19] = "/res/tiles/room3/row-2-column-9.png";
+        tileArrayPathsRoom3[20] = "/res/tiles/room3/row-2-column-10.png";
+        tileArrayPathsRoom3[21] = "/res/tiles/room3/row-2-column-11.png";
+        tileArrayPathsRoom3[22] = "/res/tiles/room3/row-3-column-1.png";
+        tileArrayPathsRoom3[23] = "/res/tiles/room3/row-3-column-2.png";
+        tileArrayPathsRoom3[24] = "/res/tiles/room3/row-3-column-3.png";
+        tileArrayPathsRoom3[25] = "/res/tiles/room3/row-3-column-4.png";
+        tileArrayPathsRoom3[26] = "/res/tiles/room3/row-3-column-5.png";
+        tileArrayPathsRoom3[27] = "/res/tiles/room3/row-3-column-6.png";
+        tileArrayPathsRoom3[28] = "/res/tiles/room3/row-3-column-7.png";
+        tileArrayPathsRoom3[29] = "/res/tiles/room3/row-3-column-8.png";
+        tileArrayPathsRoom3[30] = "/res/tiles/room3/row-3-column-9.png";
+        tileArrayPathsRoom3[31] = "/res/tiles/room3/row-3-column-10.png";
+        tileArrayPathsRoom3[32] = "/res/tiles/room3/row-3-column-11.png";
+        tileArrayPathsRoom3[33] = "/res/tiles/room3/row-4-column-1.png";
+        tileArrayPathsRoom3[34] = "/res/tiles/room3/row-4-column-2.png";
+        tileArrayPathsRoom3[35] = "/res/tiles/room3/row-4-column-3.png";
+        tileArrayPathsRoom3[36] = "/res/tiles/room3/row-4-column-4.png";
+        tileArrayPathsRoom3[37] = "/res/tiles/room3/row-4-column-5.png";
+        tileArrayPathsRoom3[38] = "/res/tiles/room3/row-4-column-6.png";
+        tileArrayPathsRoom3[39] = "/res/tiles/room3/row-4-column-7.png";
+        tileArrayPathsRoom3[40] = "/res/tiles/room3/row-4-column-8.png";
+        tileArrayPathsRoom3[41] = "/res/tiles/room3/row-4-column-9.png";
+        tileArrayPathsRoom3[42] = "/res/tiles/room3/row-4-column-10.png";
+        tileArrayPathsRoom3[43] = "/res/tiles/room3/row-4-column-11.png";
+        tileArrayPathsRoom3[44] = "/res/tiles/room3/row-5-column-1.png";
+        tileArrayPathsRoom3[45] = "/res/tiles/room3/row-5-column-2.png";
+        tileArrayPathsRoom3[46] = "/res/tiles/room3/row-5-column-3.png";
+        tileArrayPathsRoom3[47] = "/res/tiles/room3/row-5-column-4.png";
+        tileArrayPathsRoom3[48] = "/res/tiles/room3/row-5-column-5.png";
+        tileArrayPathsRoom3[49] = "/res/tiles/room3/row-5-column-6.png";
+        tileArrayPathsRoom3[50] = "/res/tiles/room3/row-5-column-7.png";
+        tileArrayPathsRoom3[51] = "/res/tiles/room3/row-5-column-8.png";
+        tileArrayPathsRoom3[52] = "/res/tiles/room3/row-5-column-9.png";
+        tileArrayPathsRoom3[53] = "/res/tiles/room3/row-5-column-10.png";
+        tileArrayPathsRoom3[54] = "/res/tiles/room3/row-5-column-11.png";
+        tileArrayPathsRoom3[55] = "/res/tiles/room3/row-6-column-1.png";
+        tileArrayPathsRoom3[56] = "/res/tiles/room3/row-6-column-2.png";
+        tileArrayPathsRoom3[57] = "/res/tiles/room3/row-6-column-3.png";
     }
 
     private void initializeTiles(int room) {

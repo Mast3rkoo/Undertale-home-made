@@ -106,13 +106,17 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();
     }
 
-    // Snimky za sekundu
+    // Ako casto sa ma hra updatovat
     int targetUpdateInterval = 60;
+
+    // Ako casto sa ma hra renderovat
+    final double RENDER_INTERVAL = 1_000_000_000.0 / 60;
 
     @Override
     public void run() {
         final double UPDATE_INTERVAL = 1_000_000_000.0 / targetUpdateInterval;
         long previousTime = System.nanoTime();
+        long lastRenderTime = System.nanoTime();
         delta = 0;
 
         while (gameThread != null) {
@@ -127,7 +131,17 @@ public class GamePanel extends JPanel implements Runnable {
                 delta--;
             }
 
-            repaint();
+            if (currentTime - lastRenderTime >= RENDER_INTERVAL) {
+                repaint();
+                lastRenderTime = currentTime;
+            }
+
+            // Sleep to reduce CPU usage
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
