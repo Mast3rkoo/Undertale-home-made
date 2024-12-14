@@ -20,7 +20,7 @@ public class TileManager {
     private int[][] mapTileNumberRoom2;
     private int[][] mapTileNumberRoom3;
     private int tileArrayLenghtRoom1 = 42;
-    private int tileArrayLenghtRoom2 = 37;
+    private int tileArrayLenghtRoom2 = 33;
     private int tileArrayLenghtRoom3 = 58;
     private String[] tileArrayPathsRoom1;
     private String[] tileArrayPathsRoom2;
@@ -132,12 +132,6 @@ public class TileManager {
         tileArrayPathsRoom2[30] = "/res/tiles/room2/row-3-column-8.png";
         tileArrayPathsRoom2[31] = "/res/tiles/room2/row-3-column-9.png";
         tileArrayPathsRoom2[32] = "/res/tiles/room2/row-3-column-10.png";
-
-        // Dummy textura
-        tileArrayPathsRoom2[33] = "/res/enemy/dummy/row-1-column-1.png";
-        tileArrayPathsRoom2[34] = "/res/enemy/dummy/row-1-column-2.png";
-        tileArrayPathsRoom2[35] = "/res/enemy/dummy/row-2-column-1.png";
-        tileArrayPathsRoom2[36] = "/res/enemy/dummy/row-2-column-2.png";
     }
 
     private void prepareTilePathsRoom3() {
@@ -224,15 +218,15 @@ public class TileManager {
                 for (int collisionTileRoom2 : collisionTilesRoom2) {
                     tileRoom2[collisionTileRoom2].setCollision(true);
                 }
-                tileRoom2[33].setEncounter(true);
-                tileRoom2[34].setEncounter(true);
-                tileRoom2[35].setEncounter(true);
-                tileRoom2[36].setEncounter(true);
                 break;
             case 3:
                 prepareTilePathsRoom3();
                 for (int i = 0; i < tileArrayLenghtRoom3; i++) {
                     tileRoom3[i] = new Tile();
+                }
+                int[] collisionTilesRoom3 = { 12, 46, 47, 48, 23, 52, 53, 54, 55, 56, 57, 42 };
+                for (int collisionTileRoom3 : collisionTilesRoom3) {
+                    tileRoom3[collisionTileRoom3].setCollision(true);
                 }
                 break;
         }

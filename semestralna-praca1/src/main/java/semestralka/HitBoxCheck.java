@@ -16,11 +16,7 @@ public class HitBoxCheck {
     public void pickEnemyEncounter(int tileId1, int tileId2) {
         if (tileId1 == 2 || tileId2 == 2) {
             gp.getFightMenu().setEnemy("flowey");
-        } else if (tileId1 == 33 || tileId2 == 33 || tileId1 == 34 || tileId2 == 34 || tileId1 == 35 || tileId2 == 35
-                || tileId1 == 36 || tileId2 == 36) {
-            gp.getFightMenu().setEnemy("dummy");
         }
-        player.setEnemyEncounterAlert(true);
     }
 
     public void checkTileCollision(int room) {

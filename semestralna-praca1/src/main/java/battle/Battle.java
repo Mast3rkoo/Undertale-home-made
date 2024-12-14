@@ -27,6 +27,7 @@ public class Battle {
     private BufferedImage[] enemyImages = new BufferedImage[4];
     private int enemyHp;
     private int enemyDamage;
+    private int enemySpeed;
     private int enemyWidth;
     private int enemyHeight;
     private int delayBetweenBullets;
@@ -80,6 +81,7 @@ public class Battle {
     public BufferedImage[] getFloweyAttributes() {
         this.enemyHp = 100;
         this.enemyDamage = 10;
+        this.enemySpeed = 4;
         this.enemyDialogue = floweyDialogue;
         this.actOptions = floweyActOptions;
         this.enemyWidth = 100;
@@ -113,6 +115,7 @@ public class Battle {
     public BufferedImage[] getDummyAttributes() {
         this.enemyHp = 200;
         this.enemyDamage = 5;
+        this.enemySpeed = 2;
         this.enemyDialogue = floweyDialogue;
         this.actOptions = floweyActOptions;
         this.enemyWidth = 120;
@@ -131,6 +134,10 @@ public class Battle {
 
     public int getEnemyDamage() {
         return this.enemyDamage;
+    }
+
+    public int getEnemySpeed() {
+        return this.enemySpeed;
     }
 
     public int getEnemyWidth() {

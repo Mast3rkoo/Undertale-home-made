@@ -20,7 +20,6 @@ import semestralka.KeyHandler;
 public class FightMenu extends Battle {
     private GamePanel gp;
     private KeyHandler keyH;
-    private DummyAttack projectile;
     private PlayerHeart playerHeart;
     private BufferedImage heart, dialogBox, actionButtons;
     private BufferedImage[] enemyImages = new BufferedImage[4];
@@ -34,8 +33,10 @@ public class FightMenu extends Battle {
     private Random random;
     private int numberOfSprite;
     private String battleMessage;
-    private ArrayList<DummyAttack> projectiles;
-    private List<DummyAttack> tempProjectiles;
+    private ArrayList<FloweyAttack> projectilesFlowey;
+    private ArrayList<DummyAttack> projectilesDummy;
+    private List<DummyAttack> tempProjectilesDummy;
+    private List<FloweyAttack> tempProjectilesFlowey;
     private int delayBetweenBullets;
     private int xOfBattleRect, widthOfBattleRect;
     private int xOfButton, yOfButton;
@@ -74,8 +75,10 @@ public class FightMenu extends Battle {
         heartLocationX = xOfButton + 13;
         heartLocationY = yOfButton + 18;
 
-        projectiles = new ArrayList<>();
-        tempProjectiles = new ArrayList<>();
+        projectilesFlowey = new ArrayList<>();
+        projectilesDummy = new ArrayList<>();
+        tempProjectilesFlowey = new ArrayList<>();
+        tempProjectilesDummy = new ArrayList<>();
 
         getFightMenuImages();
         splitImagesActions();
@@ -120,6 +123,7 @@ public class FightMenu extends Battle {
             enemyImages = getDummyAttributes();
             chosenEnemy = "dummy";
         }
+        gp.getPlayer().setEnemyEncounterAlert(true);
         System.out.print(chosenEnemy);
         hpOfEnemy = getEnemyHp();
         enemyDialogue = getEnemyDialogue();
@@ -153,10 +157,14 @@ public class FightMenu extends Battle {
                 break;
         }
         while (numberOfProjectiles > 0) {
-            makeProjectile(2, random.nextInt(10) + getEnemyDamage(), side, delayBetweenBullets);
+            makeProjectile(getEnemySpeed(), random.nextInt(10) + getEnemyDamage(), side, delayBetweenBullets);
             numberOfProjectiles--;
         }
-        tempProjectiles = new ArrayList<>(projectiles);
+        if (chosenEnemy == "flowey") {
+            tempProjectilesFlowey = new ArrayList<>(projectilesFlowey);
+        } else if (chosenEnemy == "dummy") {
+            tempProjectilesDummy = new ArrayList<>(projectilesDummy);
+        }
     }
 
     public void changeHealth(int health) {
@@ -187,15 +195,7 @@ public class FightMenu extends Battle {
         if (chosenEnemy.equals("flowey")) {
             gp.resetEncounterTile(2);
         } else if (chosenEnemy.equals("dummy")) {
-            gp.resetEncounterTile(33);
-            gp.resetEncounterTile(34);
-            gp.resetEncounterTile(35);
-            gp.resetEncounterTile(36);
-
-            gp.setCollisionTile(33);
-            gp.setCollisionTile(34);
-            gp.setCollisionTile(35);
-            gp.setCollisionTile(36);
+            gp.removeObject("dummy");
         }
     }
 
@@ -301,16 +301,27 @@ public class FightMenu extends Battle {
             }
         }
 
-        if (projectiles.size() > 0) {
-            for (DummyAttack projectile : tempProjectiles) {
-                projectile.update();
-                if (!projectile.getBulletActive()) {
-                    projectiles.remove(projectile);
+        if (projectilesDummy.size() > 0 || projectilesFlowey.size() > 0) {
+            if (chosenEnemy == "flowey") {
+                for (FloweyAttack projectile : tempProjectilesFlowey) {
+                    projectile.update();
+                    if (!projectile.getBulletActive()) {
+                        projectilesFlowey.remove(projectile);
+                    }
+                }
+            } else if (chosenEnemy == "dummy") {
+                for (DummyAttack projectile : tempProjectilesDummy) {
+                    projectile.update();
+                    if (!projectile.getBulletActive()) {
+                        projectilesDummy.remove(projectile);
+                    }
                 }
             }
         }
 
-        if (projectiles.size() == 0 && numberOfTurn == 1) {
+        if (projectilesFlowey.size() == 0 && numberOfTurn == 1 && chosenEnemy == "flowey"
+                || projectilesDummy.size() == 0
+                        && numberOfTurn == 1 && chosenEnemy == "dummy") {
             gp.changeTurn("-");
             numberOfTurn--;
             setBattleTurn();
@@ -338,10 +349,18 @@ public class FightMenu extends Battle {
 
     public void makeProjectile(int speed, int damage, String whichSide, int delayBetweenBullets) {
         setBattleTurn();
-        projectile = new DummyAttack(gp, playerHeart);
-        projectile.setFightMenu(this, whichSide);
-        projectiles.add(projectile);
-        projectile.bulletLogic(speed, damage);
+        if (chosenEnemy == "flowey") {
+            FloweyAttack projectile = new FloweyAttack(gp, playerHeart);
+            projectile.setFightMenu(this, whichSide);
+            projectilesFlowey.add(projectile);
+            projectile.bulletLogic(speed, damage);
+        } else if (chosenEnemy == "dummy") {
+            DummyAttack projectile = new DummyAttack(gp, playerHeart);
+            projectile.setFightMenu(this, whichSide);
+            projectilesDummy.add(projectile);
+            projectile.bulletLogic(speed, damage);
+        }
+
     }
 
     public void drawFightMenu(Graphics2D g2) {
@@ -504,8 +523,16 @@ public class FightMenu extends Battle {
         g2.fillRect(gp.getScreenWidth() / 2 - 50, gp.getScreenHeight() - gp.getScreenHeight() / 5,
                 getPlayerHealth(), 15);
 
-        for (DummyAttack projectile : tempProjectiles) {
-            projectile.draw(g2);
+        // Projectiles
+        if (chosenEnemy == "flowey") {
+            for (FloweyAttack projectile : tempProjectilesFlowey) {
+                projectile.draw(g2);
+            }
+        } else {
+            for (DummyAttack projectile : tempProjectilesDummy) {
+                projectile.draw(g2);
+            }
         }
+
     }
 }

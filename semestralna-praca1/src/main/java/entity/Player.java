@@ -26,7 +26,8 @@ public class Player extends Entity {
     private int imageNumber = 1;
     private int level;
     private int widthOfPlayerHitbox, heightOfPlayerHitbox;
-    private boolean enemyEncounterAlert = false;
+    private boolean enemyEncounterAlert;
+    private long alertStartTime;
 
     public Player(GamePanel gp, KeyHandler keyH, Battle battle) {
         this.gp = gp;
@@ -81,8 +82,6 @@ public class Player extends Entity {
     public int getScreenY() {
         return screenY;
     }
-
-    private long alertStartTime = 0;
 
     public void setEnemyEncounterAlert(boolean enemyEncounterAlert) {
         this.enemyEncounterAlert = enemyEncounterAlert;

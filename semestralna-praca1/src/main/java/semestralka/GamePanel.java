@@ -7,6 +7,7 @@ import entity.Player;
 import tile.TileManager;
 import battle.Battle;
 import battle.PlayerHeart;
+import tile.Object;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,6 +32,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     private double delta;
 
+    // Ako casto sa ma hra updatovat
+    private int targetUpdateInterval = 60;
+
+    // Ako casto sa ma hra renderovat
+    final double RENDER_INTERVAL = 1_000_000_000.0 / 60;
+
+    private long lastLogTime = 0;
+
     private int room = 1;
 
     private KeyHandler keyH = new KeyHandler();
@@ -41,6 +50,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Player player;
     private TileManager tileManager;
     private PlayerHeart playerHeart;
+    private Object dummyObj = new Object("dummy", tileSize * 23, tileSize * 6);
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -106,12 +116,6 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();
     }
 
-    // Ako casto sa ma hra updatovat
-    int targetUpdateInterval = 60;
-
-    // Ako casto sa ma hra renderovat
-    final double RENDER_INTERVAL = 1_000_000_000.0 / 60;
-
     @Override
     public void run() {
         final double UPDATE_INTERVAL = 1_000_000_000.0 / targetUpdateInterval;
@@ -145,8 +149,6 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    long lastLogTime = 0;
-
     public void changeFightMenu(boolean state) {
         battle.setFightMenu(state);
     }
@@ -165,6 +167,12 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setCollisionTile(int tile) {
         tileManager.setCollisionTile(room, tile);
+    }
+
+    public void removeObject(String obj) {
+        if (obj.equals("dummy")) {
+            dummyObj = null;
+        }
     }
 
     public void drawEncounter(boolean fightMenu) {
@@ -196,6 +204,11 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
         if (!battle.getFightMenu()) {
             tileManager.draw(g2, room);
+            if (room == 2) {
+                if (dummyObj != null) {
+                    dummyObj.draw(g2, this);
+                }
+            }
             player.draw(g2);
         } else if (battle.getFightMenu()) {
             fightMenu.drawFightMenu(g2);
