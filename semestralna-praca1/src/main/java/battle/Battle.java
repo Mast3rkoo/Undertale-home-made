@@ -12,7 +12,7 @@ public class Battle {
 
     // Players heart attributes
     private int worldXHeart, worldYHeart;
-    private int playerHealth = 100;
+    private int playerHealth;
 
     private int heartTopY, heartBottomY, heartLeftX, heartRightX;
     private int numberOfTurn = 0;
@@ -33,24 +33,9 @@ public class Battle {
     private int delayBetweenBullets;
     private String[] enemyDialogue;
     private String[] actOptions;
-    private String[] floweyDialogue = {
-            "You've encountered Flowey!", // Encounter
-            "You attacked Flowey!", // Attack action
-            "Trying to attack? How pathetic!", // Attack action
-            "You beg Flowey to stop.",
-            "Stop? We're just getting started!", // Begging
-            "You check Flowey's stats. HP: 100, Damage: 10", // Checking stats
-            "You used an item.", // Using an item
-            "Healing? How cute!", // Using an item
-            "You tried to run, but Flowey blocked your path.", // Trying to run
-            "You're not going anywhere!", // Trying to run
-            "You won!", // Winning
-            "Yes I am that strong!", // Checking stats
-            "" // Clear dialogue - 12
-    };
-    private String[] floweyActOptions = { "Check", "Beg" };
 
     public Battle(GamePanel gp) {
+        this.playerHealth = 100;
         xOfBattleRect = gp.getScreenWidth() / 10;
         yOfBattleRect = gp.getScreenHeight() / 5 * 2;
 
@@ -78,50 +63,91 @@ public class Battle {
         return enemyImages;
     }
 
+    private BufferedImage[] getEnemyImage(String enemy) {
+        BufferedImage enemyImage = null;
+        try {
+            enemyImage = ImageIO.read(getClass().getResourceAsStream("/res/enemy/" + enemy + ".png"));
+            return splitEnemyImages(enemyImage, 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public BufferedImage[] getFloweyAttributes() {
         this.enemyHp = 100;
         this.enemyDamage = 10;
         this.enemySpeed = 4;
-        this.enemyDialogue = floweyDialogue;
-        this.actOptions = floweyActOptions;
+        this.enemyDialogue = new String[] {
+                "You've encountered Flowey!", // Encounter
+                "You attacked Flowey!", // Attack action
+                "Trying to attack? How pathetic!", // Attack action
+                "You beg Flowey to stop.",
+                "Stop? We're just getting started!", // Begging
+                "You check Flowey's stats. HP: 100, Damage: 10", // Checking stats
+                "You used an item.", // Using an item
+                "Healing? How cute!", // Using an item
+                "You tried to run, but Flowey blocked your path.", // Trying to run
+                "You're not going anywhere!", // Trying to run
+                "You won!", // Winning
+                "Yes I am that strong!", // Checking stats
+                "" // Clear dialogue - 12
+        };
+        this.actOptions = new String[] { "Check", "Beg" };
         this.enemyWidth = 100;
         this.enemyHeight = 100;
         this.delayBetweenBullets = 100;
-        return getFloweyImages();
-    }
-
-    private BufferedImage[] getFloweyImages() {
-        BufferedImage flowey = null;
-        try {
-            flowey = ImageIO.read(getClass().getResourceAsStream("/res/enemy/flowey.png"));
-            return splitEnemyImages(flowey, 2);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private BufferedImage[] getDummyImages() {
-        BufferedImage dummy = null;
-        try {
-            dummy = ImageIO.read(getClass().getResourceAsStream("/res/enemy/dummy.png"));
-            return splitEnemyImages(dummy, 2);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return getEnemyImage("flowey");
     }
 
     public BufferedImage[] getDummyAttributes() {
         this.enemyHp = 200;
         this.enemyDamage = 5;
         this.enemySpeed = 2;
-        this.enemyDialogue = floweyDialogue;
-        this.actOptions = floweyActOptions;
+        this.enemyDialogue = new String[] { "You've encountered Dummy!", // Encounter
+                "You attacked Dummy!", // Attack action
+                "Dummy is not impressed.", // Attack action
+                "You beg Dummy to stop.",
+                "Dummy is not impressed.", // Pushing
+                "You check Dummy's stats. HP: 200, Damage: 5", // Checking stats
+                "You used an item.", // Using an item
+                "Dummy is not impressed.", // Using an item
+                "You tried to run, but Dummy blocked your path.", // Trying to run
+                "Dummy is not impressed.", // Trying to run
+                "You won!", // Winning
+                "I'm not that weak!", // Checking stats
+                "" // Clear dialogue - 12
+        };
+        this.actOptions = new String[] { "Check", "Push" };
         this.enemyWidth = 120;
         this.enemyHeight = 180;
         this.delayBetweenBullets = 200;
-        return getDummyImages();
+        return getEnemyImage("dummy");
+    }
+
+    public BufferedImage[] getSansAttributes() {
+        this.enemyHp = 300;
+        this.enemyDamage = 15;
+        this.enemySpeed = 6;
+        this.enemyDialogue = new String[] { "You've encountered Sans!", // Encounter
+                "You attacked Sans!", // Attack action
+                "You're gonna have a bad time.", // Attack action
+                "You beg Sans to stop.",
+                "You're gonna pay.", // Begging
+                "You check Sans's stats. HP: 300, Damage: 15", // Checking stats
+                "You used an item.", // Using an item
+                "You're gonna have a bad time.", // Using an item
+                "You tried to run, but Sans blocked your path.", // Trying to run
+                "You're gonna have a bad time.", // Trying to run
+                "You won!", // Winning
+                "I'm not that weak!", // Checking stats
+                "" // Clear dialogue - 12
+        };
+        this.actOptions = new String[] { "Check", "Beg" };
+        this.enemyWidth = 100;
+        this.enemyHeight = 100;
+        this.delayBetweenBullets = 100;
+        return getEnemyImage("sans");
     }
 
     public String[] getActOptions() {

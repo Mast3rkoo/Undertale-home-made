@@ -35,8 +35,10 @@ public class FightMenu extends Battle {
     private String battleMessage;
     private ArrayList<FloweyAttack> projectilesFlowey;
     private ArrayList<DummyAttack> projectilesDummy;
+    private ArrayList<SansAttack> projectilesSans;
     private List<DummyAttack> tempProjectilesDummy;
     private List<FloweyAttack> tempProjectilesFlowey;
+    private List<SansAttack> tempProjectilesSans;
     private int delayBetweenBullets;
     private int xOfBattleRect, widthOfBattleRect;
     private int xOfButton, yOfButton;
@@ -52,6 +54,8 @@ public class FightMenu extends Battle {
     private int yOfHeartAct;
     private boolean isChoicePicked;
     private String chosenEnemy;
+    private int playerDmg;
+    private int enemyKilled;
 
     public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
         super(gp);
@@ -59,13 +63,15 @@ public class FightMenu extends Battle {
         this.keyH = keyH;
         this.playerHeart = playerHeart;
 
-        random = new Random();
+        this.playerDmg = 10;
+        this.enemyKilled = 0;
+        this.random = new Random();
         numberOfSprite = 0;
         numberOfDialogueBox = 0;
         numberOfDialogueEnemy = 0;
         isChoicePicked = false;
         actHeartPosition = 0;
-        yOfHeartAct = gp.getScreenHeight() / 3 + 30;
+        yOfHeartAct = gp.getScreenHeight() / 3 + 80;
 
         xOfButton = gp.getScreenWidth() / 5;
         yOfButton = gp.getScreenHeight() - gp.getScreenHeight() / 7;
@@ -79,6 +85,8 @@ public class FightMenu extends Battle {
         projectilesDummy = new ArrayList<>();
         tempProjectilesFlowey = new ArrayList<>();
         tempProjectilesDummy = new ArrayList<>();
+        projectilesSans = new ArrayList<>();
+        tempProjectilesSans = new ArrayList<>();
 
         getFightMenuImages();
         splitImagesActions();
@@ -122,6 +130,9 @@ public class FightMenu extends Battle {
         } else if (enemy.equals("dummy")) {
             enemyImages = getDummyAttributes();
             chosenEnemy = "dummy";
+        } else if (enemy.equals("sans")) {
+            enemyImages = getSansAttributes();
+            chosenEnemy = "sans";
         }
         gp.getPlayer().setEnemyEncounterAlert(true);
         System.out.print(chosenEnemy);
@@ -164,6 +175,8 @@ public class FightMenu extends Battle {
             tempProjectilesFlowey = new ArrayList<>(projectilesFlowey);
         } else if (chosenEnemy == "dummy") {
             tempProjectilesDummy = new ArrayList<>(projectilesDummy);
+        } else if (chosenEnemy == "sans") {
+            tempProjectilesSans = new ArrayList<>(projectilesSans);
         }
     }
 
@@ -186,6 +199,17 @@ public class FightMenu extends Battle {
         actOptionsOpen = false;
         positionOfHeart = 0;
         heartLocationX = xOfButton + 13;
+        switch (enemyKilled) {
+            case 1:
+                setPlayerHealth(150);
+                break;
+            case 2:
+                setPlayerHealth(200);
+                break;
+            default:
+                setPlayerHealth(100);
+                break;
+        }
         setNumberOfTurn(0);
         keyH.setEnterPressed(false);
         gp.drawEncounter(fightMenu);
@@ -202,9 +226,16 @@ public class FightMenu extends Battle {
     public void update() {
         int numberOfTurn = getNumberOfTurn();
         // Action choices movement
-        if (hpOfEnemy <= 0 || getPlayerHealth() <= 0) {
+        if (getPlayerHealth() <= 0) {
+            gp.changeFightMenu(false);
+            return;
+        }
+        if (hpOfEnemy <= 0) {
             removeEncounterTile();
             gp.changeFightMenu(false);
+            this.playerDmg += 10;
+            setPlayerHealth(50);
+            this.enemyKilled += 1;
             return;
         }
         if (numberOfTurn == 0) {
@@ -223,7 +254,7 @@ public class FightMenu extends Battle {
                 keyH.setEnterPressed(false);
                 // Attack logic
                 numberOfSprite = 1;
-                hpOfEnemy -= random.nextInt(21) + 10;
+                hpOfEnemy -= random.nextInt(21) + this.playerDmg;
                 numberOfDialogueEnemy = 2;
                 // Changes sprite to make it look like it hurt the enemy and then changes it
                 // back to 0 meaning the normal state after 1 second
@@ -244,14 +275,33 @@ public class FightMenu extends Battle {
             } else if (keyH.isEnterPressed() && positionOfHeart == 2 && hpOfEnemy > 0 && numberOfTurn == 0
                     && !isChoicePicked) {
                 keyH.setEnterPressed(false);
-                if (getPlayerHealth() < 100) {
-                    int healedAmount = random.nextInt(21) + 10;
-                    if (getPlayerHealth() + healedAmount > 100) {
-                        setPlayerHealth(100);
-                    } else {
-                        setPlayerHealth(getPlayerHealth() + healedAmount);
-                    }
+                int healedAmount = random.nextInt(21) + playerDmg;
+                switch (enemyKilled) {
+                    case 0:
+                        if (getPlayerHealth() + healedAmount > 100) {
+                            setPlayerHealth(100);
+                        } else {
+                            setPlayerHealth(getPlayerHealth() + healedAmount);
+                        }
+                        break;
+                    case 1:
+                        if (getPlayerHealth() + healedAmount > 150) {
+                            setPlayerHealth(150);
+                        } else {
+                            setPlayerHealth(getPlayerHealth() + healedAmount);
+                        }
+                        break;
+                    case 2:
+                        if (getPlayerHealth() + healedAmount > 200) {
+                            setPlayerHealth(200);
+                        } else {
+                            setPlayerHealth(getPlayerHealth() + healedAmount);
+                        }
+                        break;
+                    default:
+                        break;
                 }
+
                 numberOfDialogueBox = 6;
                 numberOfDialogueEnemy = 7;
                 isChoicePicked = true;
@@ -275,11 +325,11 @@ public class FightMenu extends Battle {
             }
             if (actOptionsOpen && isChoicePicked) {
                 if (keyH.isDownPressed() && actHeartPosition == 0) {
-                    yOfHeartAct = gp.getScreenHeight() / 3 + 30 + 60;
+                    yOfHeartAct = gp.getScreenHeight() / 3 + 80 + 60;
                     actHeartPosition++;
                     keyH.setDownPressed(false);
                 } else if (keyH.isUpPressed() && actHeartPosition == 1) {
-                    yOfHeartAct = gp.getScreenHeight() / 3 + 30;
+                    yOfHeartAct = gp.getScreenHeight() / 3 + 80;
                     actHeartPosition--;
                     keyH.setUpPressed(false);
                 }
@@ -301,7 +351,7 @@ public class FightMenu extends Battle {
             }
         }
 
-        if (projectilesDummy.size() > 0 || projectilesFlowey.size() > 0) {
+        if (projectilesDummy.size() > 0 || projectilesFlowey.size() > 0 || projectilesSans.size() > 0) {
             if (chosenEnemy == "flowey") {
                 for (FloweyAttack projectile : tempProjectilesFlowey) {
                     projectile.update();
@@ -316,12 +366,21 @@ public class FightMenu extends Battle {
                         projectilesDummy.remove(projectile);
                     }
                 }
+            } else if (chosenEnemy == "sans") {
+                for (SansAttack projectile : tempProjectilesSans) {
+                    projectile.update();
+                    if (!projectile.getBulletActive()) {
+                        projectilesSans.remove(projectile);
+                    }
+                }
             }
         }
 
         if (projectilesFlowey.size() == 0 && numberOfTurn == 1 && chosenEnemy == "flowey"
                 || projectilesDummy.size() == 0
-                        && numberOfTurn == 1 && chosenEnemy == "dummy") {
+                        && numberOfTurn == 1 && chosenEnemy == "dummy"
+                || projectilesSans.size() == 0
+                        && numberOfTurn == 1 && chosenEnemy == "sans") {
             gp.changeTurn("-");
             numberOfTurn--;
             setBattleTurn();
@@ -358,6 +417,11 @@ public class FightMenu extends Battle {
             DummyAttack projectile = new DummyAttack(gp, playerHeart);
             projectile.setFightMenu(this, whichSide);
             projectilesDummy.add(projectile);
+            projectile.bulletLogic(speed, damage);
+        } else if (chosenEnemy == "sans") {
+            SansAttack projectile = new SansAttack(gp, playerHeart);
+            projectile.setFightMenu(this, whichSide);
+            projectilesSans.add(projectile);
             projectile.bulletLogic(speed, damage);
         }
 
@@ -528,8 +592,12 @@ public class FightMenu extends Battle {
             for (FloweyAttack projectile : tempProjectilesFlowey) {
                 projectile.draw(g2);
             }
-        } else {
+        } else if (chosenEnemy == "dummy") {
             for (DummyAttack projectile : tempProjectilesDummy) {
+                projectile.draw(g2);
+            }
+        } else if (chosenEnemy == "sans") {
+            for (SansAttack projectile : tempProjectilesSans) {
                 projectile.draw(g2);
             }
         }

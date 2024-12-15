@@ -15,7 +15,8 @@ public class HitBoxCheck {
 
     public void pickEnemyEncounter(int tileId1, int tileId2) {
         if (tileId1 == 2 || tileId2 == 2) {
-            gp.getFightMenu().setEnemy("flowey");
+            gp.getFightMenu().setEnemy("sans");
+            // TODO - set enemy stats
         }
     }
 
