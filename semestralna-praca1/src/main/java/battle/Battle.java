@@ -30,7 +30,6 @@ public class Battle {
     private int enemySpeed;
     private int enemyWidth;
     private int enemyHeight;
-    private int delayBetweenBullets;
     private String[] enemyDialogue;
     private String[] actOptions;
 
@@ -63,11 +62,11 @@ public class Battle {
         return enemyImages;
     }
 
-    private BufferedImage[] getEnemyImage(String enemy) {
+    private BufferedImage[] getEnemyImage(String enemy, int imageCount) {
         BufferedImage enemyImage = null;
         try {
             enemyImage = ImageIO.read(getClass().getResourceAsStream("/res/enemy/" + enemy + ".png"));
-            return splitEnemyImages(enemyImage, 2);
+            return splitEnemyImages(enemyImage, imageCount);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -96,8 +95,7 @@ public class Battle {
         this.actOptions = new String[] { "Check", "Beg" };
         this.enemyWidth = 100;
         this.enemyHeight = 100;
-        this.delayBetweenBullets = 100;
-        return getEnemyImage("flowey");
+        return getEnemyImage("flowey", 2);
     }
 
     public BufferedImage[] getDummyAttributes() {
@@ -121,8 +119,7 @@ public class Battle {
         this.actOptions = new String[] { "Check", "Push" };
         this.enemyWidth = 120;
         this.enemyHeight = 180;
-        this.delayBetweenBullets = 200;
-        return getEnemyImage("dummy");
+        return getEnemyImage("dummy", 2);
     }
 
     public BufferedImage[] getSansAttributes() {
@@ -146,8 +143,7 @@ public class Battle {
         this.actOptions = new String[] { "Check", "Beg" };
         this.enemyWidth = 100;
         this.enemyHeight = 100;
-        this.delayBetweenBullets = 100;
-        return getEnemyImage("sans");
+        return getEnemyImage("sans", 4);
     }
 
     public String[] getActOptions() {
@@ -176,10 +172,6 @@ public class Battle {
 
     public String[] getEnemyDialogue() {
         return this.enemyDialogue;
-    }
-
-    public int getDelayBetweenBullets() {
-        return this.delayBetweenBullets;
     }
 
     public int getWidthOfBattleRect() {

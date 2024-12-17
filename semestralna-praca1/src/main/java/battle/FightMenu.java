@@ -21,6 +21,7 @@ public class FightMenu extends Battle {
     private GamePanel gp;
     private KeyHandler keyH;
     private PlayerHeart playerHeart;
+    private PlayerHeartBlue playerHeartBlue;
     private BufferedImage heart, dialogBox, actionButtons;
     private BufferedImage[] enemyImages = new BufferedImage[4];
     private BufferedImage[] actionButtonImages = new BufferedImage[8];
@@ -39,7 +40,6 @@ public class FightMenu extends Battle {
     private List<DummyAttack> tempProjectilesDummy;
     private List<FloweyAttack> tempProjectilesFlowey;
     private List<SansAttack> tempProjectilesSans;
-    private int delayBetweenBullets;
     private int xOfBattleRect, widthOfBattleRect;
     private int xOfButton, yOfButton;
     private int buttonImageWidth, buttonImageHeight;
@@ -56,12 +56,14 @@ public class FightMenu extends Battle {
     private String chosenEnemy;
     private int playerDmg;
     private int enemyKilled;
+    private int sansFaze;
 
-    public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart) {
+    public FightMenu(GamePanel gp, KeyHandler keyH, PlayerHeart playerHeart, PlayerHeartBlue playerHeartBlue) {
         super(gp);
         this.gp = gp;
         this.keyH = keyH;
         this.playerHeart = playerHeart;
+        this.playerHeartBlue = playerHeartBlue;
 
         this.playerDmg = 10;
         this.enemyKilled = 0;
@@ -141,41 +143,65 @@ public class FightMenu extends Battle {
         actOptions = getActOptions();
         enemyWidth = getEnemyWidth();
         enemyHeight = getEnemyHeight();
-        delayBetweenBullets = getDelayBetweenBullets();
     }
 
     public void enemyAttack() {
+        playerHeartBlue.resetPlayerPosition();
         gp.changeTurn("+");
         setNumberOfTurn(1);
         setBattleTurn();
-        int numberOfProjectiles = random.nextInt(10) + 10;
-        int randomSide = random.nextInt(3);
         String side = "";
-        switch (randomSide) {
-            case 0:
-                side = "top";
-                break;
-            case 1:
-                side = "bottom";
-                break;
-            case 2:
-                side = "left";
-                break;
-            case 3:
-                side = "right";
-                break;
-            default:
-                break;
-        }
-        while (numberOfProjectiles > 0) {
-            makeProjectile(getEnemySpeed(), random.nextInt(10) + getEnemyDamage(), side, delayBetweenBullets);
-            numberOfProjectiles--;
-        }
-        if (chosenEnemy == "flowey") {
-            tempProjectilesFlowey = new ArrayList<>(projectilesFlowey);
-        } else if (chosenEnemy == "dummy") {
-            tempProjectilesDummy = new ArrayList<>(projectilesDummy);
-        } else if (chosenEnemy == "sans") {
+        int numberOfProjectiles = 0;
+        if (!chosenEnemy.equals("sans")) {
+            if (chosenEnemy.equals("flowey")) {
+                numberOfProjectiles = random.nextInt(20) + 10;
+            } else {
+                numberOfProjectiles = random.nextInt(10) + 10;
+            }
+            while (numberOfProjectiles > 0) {
+                int randomSide = random.nextInt(4);
+                switch (randomSide) {
+                    case 0:
+                        side = "top";
+                        break;
+                    case 1:
+                        side = "bottom";
+                        break;
+                    case 2:
+                        side = "left";
+                        break;
+                    case 3:
+                        side = "right";
+                        break;
+                    default:
+                        break;
+                }
+                makeProjectile(getEnemySpeed(), random.nextInt(10) + getEnemyDamage(), side);
+                numberOfProjectiles--;
+            }
+            if (chosenEnemy.equals("flowey")) {
+                tempProjectilesFlowey = new ArrayList<>(projectilesFlowey);
+            } else if (chosenEnemy.equals("dummy")) {
+                tempProjectilesDummy = new ArrayList<>(projectilesDummy);
+            }
+        } else {
+            numberOfProjectiles = random.nextInt(10) + 10;
+            while (numberOfProjectiles > 0) {
+                int randomSideSans = random.nextInt(2);
+                switch (randomSideSans) {
+                    case 0:
+                        side = "left";
+                        break;
+                    case 1:
+                        side = "right";
+                        break;
+                    default:
+                        break;
+                }
+                System.out.println(randomSideSans + " " + side);
+                makeProjectile(getEnemySpeed(), random.nextInt(10) + 10, side);
+                numberOfProjectiles--;
+            }
             tempProjectilesSans = new ArrayList<>(projectilesSans);
         }
     }
@@ -186,6 +212,10 @@ public class FightMenu extends Battle {
 
     public void setTurn(int numberOfTurn) {
         setNumberOfTurn(numberOfTurn);
+    }
+
+    public String getEncounteredEnemy() {
+        return this.chosenEnemy;
     }
 
     public void setEncounter(boolean fightMenu) {
@@ -400,29 +430,31 @@ public class FightMenu extends Battle {
             setWorldXHeart((gp.getScreenWidth() - 16) / 2);
             setWorldYHeart((gp.getScreenHeight() + 170 / 2) / 2);
             playerHeart.setPlayerHeartHitbox(new Rectangle(getWorldXHeart(), getWorldYHeart(), 16, 16));
+            playerHeartBlue.setPlayerHeartHitbox(new Rectangle(getWorldXHeart(), getWorldYHeart(), 16, 16));
             setWidthOfBattleRect(buttonImageWidth * 4 + gapBetweenButtons * 3);
             setXOfBattleRect(xOfButton);
             battleMessage = "Flowey wants to fight!";
         }
     }
 
-    public void makeProjectile(int speed, int damage, String whichSide, int delayBetweenBullets) {
+    public void makeProjectile(int speed, int damage, String whichSide) {
+        int damageBasedOnKilled = damage - enemyKilled * 5;
         setBattleTurn();
         if (chosenEnemy == "flowey") {
             FloweyAttack projectile = new FloweyAttack(gp, playerHeart);
             projectile.setFightMenu(this, whichSide);
             projectilesFlowey.add(projectile);
-            projectile.bulletLogic(speed, damage);
+            projectile.bulletLogic(speed, damageBasedOnKilled);
         } else if (chosenEnemy == "dummy") {
             DummyAttack projectile = new DummyAttack(gp, playerHeart);
             projectile.setFightMenu(this, whichSide);
             projectilesDummy.add(projectile);
-            projectile.bulletLogic(speed, damage);
+            projectile.bulletLogic(speed, damageBasedOnKilled);
         } else if (chosenEnemy == "sans") {
-            SansAttack projectile = new SansAttack(gp, playerHeart);
+            SansAttack projectile = new SansAttack(gp, playerHeartBlue);
             projectile.setFightMenu(this, whichSide);
             projectilesSans.add(projectile);
-            projectile.bulletLogic(speed, damage);
+            projectile.bulletLogic(damageBasedOnKilled);
         }
 
     }

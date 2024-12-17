@@ -7,6 +7,7 @@ import entity.Player;
 import tile.TileManager;
 import battle.Battle;
 import battle.PlayerHeart;
+import battle.PlayerHeartBlue;
 import tile.Object;
 
 import java.awt.Color;
@@ -50,6 +51,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Player player;
     private TileManager tileManager;
     private PlayerHeart playerHeart;
+    private PlayerHeartBlue playerHeartBlue;
     private Object dummyObj = new Object("dummy", tileSize * 23, tileSize * 6);
 
     public GamePanel() {
@@ -63,8 +65,10 @@ public class GamePanel extends JPanel implements Runnable {
         tileManager = new TileManager(this);
         player.setTileManager(tileManager);
         playerHeart = new PlayerHeart(this, keyH);
-        fightMenu = new FightMenu(this, keyH, playerHeart);
+        playerHeartBlue = new PlayerHeartBlue(this, keyH);
+        fightMenu = new FightMenu(this, keyH, playerHeart, playerHeartBlue);
         playerHeart.setFightMenu(fightMenu);
+        playerHeartBlue.setFightMenu(fightMenu);
     }
 
     public int getTileSize() {
@@ -190,7 +194,11 @@ public class GamePanel extends JPanel implements Runnable {
         } else {
             fightMenu.update();
             if (fightMenu.getNumberOfTurn() == 1) {
-                playerHeart.update();
+                if (fightMenu.getEncounteredEnemy().equals("sans")) {
+                    playerHeartBlue.update();
+                } else {
+                    playerHeart.update();
+                }
             }
             if (currentTime - lastLogTime >= 1000) {
                 lastLogTime = currentTime;
@@ -213,7 +221,11 @@ public class GamePanel extends JPanel implements Runnable {
         } else if (battle.getFightMenu()) {
             fightMenu.drawFightMenu(g2);
             if (fightMenu.getNumberOfTurn() == 1) {
-                playerHeart.draw(g2);
+                if (fightMenu.getEncounteredEnemy().equals("sans")) {
+                    playerHeartBlue.draw(g2);
+                } else {
+                    playerHeart.draw(g2);
+                }
             }
         } else {
             System.out.println("Error in paintComponent");
